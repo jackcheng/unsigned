@@ -53,7 +53,7 @@ G.scene('tok_arrive', [
       learn('gshock')
     ]),
     opt('“What did quartz do to people?”', [
-      d('aiko', 'You know the Swiss part better than me. Ninety thousand watchmakers in 1970. Thirty thousand by the mid-eighties. Whole towns. The [[quartz crisis]].'),
+      d('aiko', 'You know the Swiss part better than me. Ninety thousand watch jobs in 1970. Thirty thousand by the mid-eighties. Whole towns. The [[quartz crisis]].'),
       d('aiko', 'But grandfather said: tell them what it did *here*. In 1975 Seiko stopped making mechanical Grand Seiko. Just stopped. Nobody at Suwa adjusted a hairspring any more. He was thirty-seven. They put him on a line fitting batteries.'),
       d('aiko', 'He says quartz didn’t beat the Swiss. It beat the *hand*. Everybody’s hand. It only reached Switzerland a few years late.')
     ]),

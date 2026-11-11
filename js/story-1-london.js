@@ -51,12 +51,12 @@ G.scene('lon_peg', [
     ]),
     opt('“What’s that on your wrist?”', [
       d('peg', 'Smiths W10. Nineteen sixty-eight. Made in Cheltenham: case, dial, movement, the lot. The last watch the British Army ever bought that was built in England.'),
-      d('peg', 'We invented half of this, you know. The lever escapement. The balance spring. By the time this was made we had one factory left, and then that shut. After that the Army bought Swiss again, and in 1980 it bought quartz, the G10, and that was the end of winding.'),
+      d('peg', 'We invented half of this, you know. The lever escapement. The balance spring, if you ask an Englishman. By the time this was made we had one factory left, and then that shut. After that the Army bought Swiss again, and in 1980 it bought quartz, the G10, and that was the end of winding.'),
       learn('w10', 'g10'),
       d('peg', 'I wear it so that somebody does.')
     ]),
     opt('“Did army watches change what everyone else wore?”', [
-      d('peg', 'Everything you think a “proper” watch looks like came out of an army specification. Dark dial, white numbers, nothing you don’t need. When Rolex wanted a watch for Everest in ’53, what they built was an officer’s watch with the rank taken off. The Explorer.'),
+      d('peg', 'Everything you think a “proper” watch looks like came out of an army specification. Dark dial, white numbers, nothing you don’t need. After Everest in ’53, when Rolex wanted a watch to sell on the back of it, what they built was an officer’s watch with the rank taken off. The Explorer.'),
       learn('explorer'),
       d('peg', 'And the Americans kept at it. Korea, Vietnam: cheap, tough, olive drab, built to a government paper. The Hamilton you can buy in any shopping centre today is that watch with a nicer strap.'),
       learn('khaki'),

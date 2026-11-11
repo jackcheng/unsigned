@@ -170,9 +170,13 @@ function menu(root, arg, close) {
       <button class="btn" data-a="resume">Resume</button>
       <button class="btn" data-a="log">Read back</button>
       <button class="btn" data-a="sound">Sound: ${Sound.on ? 'on' : 'off'}</button>
+      <label class="vol"><span>Volume</span><input type="range" min="0" max="100" step="5" value="${Math.round(Sound.vol * 100)}" aria-label="Volume"></label>
       <button class="btn" data-a="motion">Scene motion: ${G.motion.rate > 0 ? 'on' : 'off'}</button>
       <button class="btn" data-a="title">Back to the title</button>
       <p class="mnote">The game saves by itself at the start of every scene.</p>`;
+    const vr = $('.vol input', wrap);
+    vr.oninput = () => { Sound.init(); Sound.setVol(vr.value / 100); if (!Sound.on && +vr.value > 0) { Sound.toggle(); $('#hud .snd').classList.remove('off'); $('[data-a="sound"]', wrap).textContent = 'Sound: on'; } };
+    vr.onchange = () => Sound.sfx('note');
     $$('button', wrap).forEach(b => b.onclick = () => {
       const a = b.dataset.a;
       if (a === 'resume') close();

@@ -76,7 +76,7 @@ G.scene('par_two', [
       opt('“What do you do with a name?”', [])
     ]),
     d('gaspard', 'In 1983 two men bought the name Blancpain for twenty-two thousand francs. There had been no Blancpain watches for years; the firm was a file in a drawer. They wrote one sentence. *Since 1735 there has never been a quartz Blancpain watch. And there never will be.*'),
-    d('gaspard', 'Of course there had not. There had been no Blancpain watches at all. That sentence is now worth more than most banks. People do not buy movements, Lou. They buy a sentence with a date in it.'),
+    d('gaspard', 'Of course there had not. For years there had been no Blancpain watches at all. That sentence is now worth more than most banks. People do not buy movements, Lou. They buy a sentence with a date in it.'),
     learn('blancpain83'),
     n('He takes something from an inside pocket, wrapped in grey cloth.'),
     show('coremontNew', { label: 'Corémont — next year' }),

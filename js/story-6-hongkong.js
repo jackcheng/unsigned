@@ -11,7 +11,7 @@ G.scene('hk_arrive', [
   chapter('Chapter Six', 'The Time Before', 'Hong Kong'),
   travel('hongkong', { note: 'Four hours south-west. You change your watch by one hour, and your coat entirely.', cost: 310 }),
   bg('hk'), music('neon'), hud('Tsim Sha Tsui · Hong Kong', 'December 23'),
-  n('For most of the last forty years Hong Kong has bought more Swiss watches than anywhere on earth. On Nathan Road every third shopfront is a wall of them, under lights hot enough to tan. The real business is upstairs.'),
+  n('For much of the last twenty years Hong Kong has bought more Swiss watches than anywhere on earth. On Nathan Road every third shopfront is a wall of them, under lights hot enough to tan. The real business is upstairs.'),
   n('Four flights up, behind a steel gate: a room the size of a lift. One desk, one safe, one fan, one man.'),
   d('wing', 'Sakamoto’s friend’s grandchild. Sit down. He says my bezels are wrong?'),
   me('He said to tell you they are *still* wrong.'),
@@ -95,8 +95,8 @@ G.scene('hk_arrive', [
 
 G.scene('hk_factory', [
   hide(), bg('factory'), music('city'), hud('A case factory, across the border', 'December 24'),
-  n('Forty minutes by train and one border, in a district that is nothing but factories. Kit Leung’s family have been making watch cases here since Kit’s grandfather bought one second-hand lathe in 1968.'),
-  d('kit', 'Granddad started with plastic. LCD cases, 1977: two million a year, for brands in Texas and Tokyo. People say “the quartz crisis” as if it was weather. It was us. It was this street.'),
+  n('Forty minutes by train and one border, in a district that is nothing but factories. Kit Leung’s family have been making watch cases since Kit’s grandfather bought one second-hand lathe in Kowloon in 1968. They moved the works over the border in the eighties.'),
+  d('kit', 'Granddad started with plastic. LCD cases, 1977: two million a year, for brands in Texas and Tokyo. People say “the quartz crisis” as if it was weather. It was us. It was Kowloon.'),
   n('Now it is a hall as clean as a hospital. Forty machines the size of wardrobes, each with a window, each milling a block of steel into a watch case with a sound like tearing silk.'),
   hub('Ask Kit…', [
     opt('“Who are these for?”', [

@@ -126,7 +126,7 @@ W.cymaA = {
     { id: 'sub', v: 'dial', at: [0, 0.42], r: 0.2, t: 'Seconds at six', x: 'A soldier glancing down needs one answer before any other: is it still running? So the seconds get a dial of their own.' },
     { id: 'crystal', v: 'dial', at: [-0.42, -0.5], r: 0.2, t: 'A scuffed crystal', x: 'Acrylic, scratched grey. It polishes out with a dab of paste and ten minutes. Hardly a flaw, but worth a mention.' },
     { id: 'dead', v: 'uv', at: [0, -0.1], r: 0.9, t: 'Almost nothing', x: 'A ghost of grey, if that. Eighty-year-old radium is still radioactive, but the compound that did the glowing burnt out long ago. A W.W.W. that lights up like a torch has been repainted.' },
-    { id: 'www', v: 'back', at: [0, -0.13], r: 0.16, t: 'W.W.W.', x: '*Watch, Wrist, Waterproof*: the Ministry’s name for the specification. Black dial, luminous hands, seconds at six, shatterproof crystal, accurate to a [[chronometer]]’s standard. Twelve Swiss firms built to it.' },
+    { id: 'www', v: 'back', at: [0, -0.13], r: 0.16, t: 'W.W.W.', x: '*Watch, Wristlet, Waterproof*: the Ministry’s name for the specification. Black dial, luminous hands, seconds at six, shatterproof crystal, accurate to a [[chronometer]]’s standard. Twelve Swiss firms built to it.' },
     { id: 'nums', v: 'back', at: [0, 0.27], r: 0.2, t: 'Two numbers', x: 'The Army’s serial, with Cyma’s letter P; under it the maker’s own case number. Both struck deep, by the same hand, at the same time.' },
     { id: 'bars', v: 'back', at: [0, -1.12], r: 0.22, t: 'Fixed bars', x: 'The strap bars are solid steel, soldered into the lugs. If a bar can’t spring out, a watch can’t be lost. It is why these wear one-piece straps that thread through: what the world now calls a [[NATO strap]].' }
   ]
@@ -139,7 +139,7 @@ W.recordB = {
   obs: [
     { id: 'circleT', v: 'dial', at: [0, -0.18], r: 0.13, t: 'A T in a circle', x: 'No arrow here: a circled T. In the 1950s and 60s the Ministry of Defence pulled the radium out of its watches and re-dialled them with [[tritium]], marked with this T. A [[service dial]]: not original, but not a forgery either.' },
     { id: 'print', v: 'dial', at: at(300, 0.6), r: 0.15, t: 'Sharp white numerals', x: 'Whiter and crisper than the Cyma’s. Twenty years younger, and it shows.' },
-    { id: 'brass', v: 'dial', at: [-0.96, 0.25], r: 0.16, t: 'Yellow at the edges', x: 'Where the plating has worn through, brass shows. Most of the twelve makers chrome-plated a brass case. Only a few used solid steel.' },
+    { id: 'brass', v: 'dial', at: [-0.96, 0.25], r: 0.16, t: 'Yellow at the edges', x: 'Where the plating has worn through, brass shows. A few of the twelve makers chrome-plated a brass case. Most used solid steel.' },
     { id: 'faint', v: 'uv', at: [0, -0.1], r: 0.9, t: 'A faint, even ghost', x: 'A weak green breath from dots and hands alike. Tritium loses half its glow every twelve years or so. Even, faint, matching: as it should be.' },
     { id: 'nums', v: 'back', at: [0, 0.27], r: 0.2, t: 'Two numbers', x: 'L for Record, then the maker’s number. Deep and right.' }
   ]
@@ -224,7 +224,7 @@ W.enicarA = {
   views: ['dial', 'uv', 'inside', 'movement'],
   verdict: 'Twin crowns, the bezel under the glass, the little helmet inside the back. Émile’s workshop made this case, or one beside it on the same bench.',
   obs: [
-    { id: 'crown2', v: 'dial', at: at(60, 1.07), r: 0.16, t: 'A cross-hatched crown', x: 'Cut like the face of a file. That cross-hatch is the signature of one case-maker in the Jura: Ervin Piquerez S.A., [[EPSA]]. They built cases for a hundred brands and signed them on the crown.' },
+    { id: 'crown2', v: 'dial', at: at(60, 1.07), r: 0.16, t: 'A cross-hatched crown', x: 'Cut like the face of a file. That cross-hatch is the calling card of one case-maker in the Jura: Ervin Piquerez S.A., [[EPSA]]. They built cases for a hundred brands, and most of them wear this crown.' },
     { id: 'crown4', v: 'dial', at: at(120, 1.07), r: 0.16, t: 'The lower crown', x: 'Also cross-hatched, but the pattern is sharper and the steel a shade brighter. A replacement, and an old one. Correct part, wrong decade.' },
     { id: 'inner', v: 'dial', at: [0, -0.74], r: 0.16, t: 'A bezel under glass', x: 'The minute ring sits *inside* the crystal, turned by the upper crown. Nothing can knock it. No sand can jam it. The price is a second hole in the case.' },
     { id: 'tide', v: 'dial', at: [-0.42, 0.5], r: 0.2, t: 'A tide-line', x: 'A faint brown bloom along the lower edge of the dial. Once, in sixty years, water got past a tired seal. It is a dive watch that has actually been wet.' },
@@ -280,7 +280,7 @@ W.pogueC = {
   name: 'Seiko 6139 “Pogue”', sub: 'automatic chronograph · November 1973',
   cfg: POGUE({ wear: { scratches: 9 }, back: { arcTop: 'WATER RESISTANT · STAINLESS STEEL', lines: [{ t: 'SEIKO', y: -0.16, s: 12, w: 600 }, { t: '6139-6002', y: 0.1, s: 8 }, { t: '3N4087', y: 0.34, s: 8 }], arcBottom: 'JAPAN' }, mov: { type: 'chrono', rotor: true, finish: 'nickel', rotorText: 'SEIKO · 17 JEWELS · 6139B' } }),
   views: ['dial', 'back', 'movement'],
-  verdict: 'One of the three automatic chronographs of 1969, and the one that went to Skylab. Honest, a little faded, and a cousin rather than a sister.',
+  verdict: 'One of the three automatic chronographs of 1969, and the calibre that went to Skylab. Honest, a little faded, and a cousin rather than a sister.',
   obs: [
     { id: 'dial', v: 'dial', at: [-0.3, -0.05], r: 0.2, t: 'Gold going to mustard', x: 'A sunburst that was once bright gold and has settled, evenly, toward mustard. The printing is hair-fine. Nobody has been near this with a paintbrush.' },
     { id: 'one', v: 'dial', at: [0, 0.38], r: 0.17, t: 'One register', x: 'A single counter at six, where Swiss chronographs have two or three. Seiko’s engineers asked what a person actually reads, and left the rest out.' },
@@ -303,11 +303,11 @@ W.pogueB = {
 
 /* ---- Tokyo / Suwa ---- */
 W.seikoQR = {
-  name: 'Seiko Quartz QR, ref. 3823', sub: 'June 1973 · hers',
+  name: 'Seiko Quartz QR, ref. 3863', sub: 'June 1973 · hers',
   cfg: { mm: 37, shape: 'cushion', metal: 'steel', quartz: true, bezel: { type: 'thin' }, lugs: 'none',
-    dial: { color: '#2b4a7a', finish: 'sunburst', track: 'ticks', indices: 'baton', applied: 'steel', ink: '#f3f3f3', date: { pos: 3, day: 'FRI', frame: true }, text: [{ t: 'SEIKO', y: -0.38, s: 10, w: 600, ls: 1 }, { t: 'QUARTZ', y: 0.3, s: 5.4, ls: 1.6 }, { t: 'QR', y: 0.44, s: 8.5, w: 600, ls: 1 }], arc: 'JAPAN 3823-7000 T' },
+    dial: { color: '#2b4a7a', finish: 'sunburst', track: 'ticks', indices: 'baton', applied: 'steel', ink: '#f3f3f3', date: { pos: 3, day: 'FRI', frame: true }, text: [{ t: 'SEIKO', y: -0.38, s: 10, w: 600, ls: 1 }, { t: 'QUARTZ', y: 0.3, s: 5.4, ls: 1.6 }, { t: 'QR', y: 0.44, s: 8.5, w: 600, ls: 1 }], arc: 'JAPAN 3863-7010 T' },
     hands: { style: 'baton', color: 'steel', seconds: 'center' }, strap: { type: 'bracelet', kind: 'h' }, wear: { scratches: 6 },
-    back: { arcTop: 'WATER RESISTANT · STAINLESS STEEL', lines: [{ t: 'SEIKO', y: -0.2, s: 13, w: 600 }, { t: '3823-7000', y: 0.06, s: 8 }, { t: '362951', y: 0.3, s: 8 }], arcBottom: 'JAPAN' },
+    back: { arcTop: 'WATER RESISTANT · STAINLESS STEEL', lines: [{ t: 'SEIKO', y: -0.2, s: 13, w: 600 }, { t: '3863-7010', y: 0.06, s: 8 }, { t: '362951', y: 0.3, s: 8 }], arcBottom: 'JAPAN' },
     inside: { stamps: [{ t: 'SEIKO', y: -0.6, s: 7 }, { t: 'STAINLESS STEEL', y: 0.62, s: 5.5 }], marks: [{ t: 'BC 73', x: -0.5, y: -0.16, rot: -5, s: 10 }, { t: 'démontée,', x: -0.5, y: 0.0, rot: -4, s: 9 }, { t: 'comprise,', x: -0.5, y: 0.13, rot: -4, s: 9 }, { t: 'remontée.', x: -0.5, y: 0.26, rot: -4, s: 9 }] },
     mov: { type: 'quartz', cell: 'SEIKO SB-B9' } },
   views: ['dial', 'back', 'inside', 'movement'],
@@ -433,7 +433,7 @@ G.pages = [
       'What it taught me: two buttons, three hands too many, a scale round the edge, and still you can read it at a glance. Complication is not the enemy of clarity. Carelessness is.' ],
     sold: 'Vendue 1991 — the winter the shop nearly closed. I timed the bailiff with it first. Eleven minutes.' },
   { id: 'quartz', num: 'V', title: 'L’ennemi', when: '1973 – 1998', sketch: 'seikoQR',
-    fr: 'Seiko 3823, quartz. Pas de balancier. Pas de spiral. Moteur pas-à-pas. ± 15 s par MOIS. Démontée, comprise, remontée.',
+    fr: 'Seiko 3863, quartz. Pas de balancier. Pas de spiral. Moteur pas-à-pas. ± 15 s par MOIS. Démontée, comprise, remontée.',
     body: [
       'June 1973. I bought the enemy at a jeweller’s in Bienne, where nobody knew me, with cash, like a spy.',
       'I took it apart on the kitchen table after Claire was asleep. No balance. No hairspring. A sliver of stone that sings thousands of times a second, a circuit that counts the song, and a motor the size of a lentil.',
@@ -494,7 +494,7 @@ G.terms = {
   'chronometer': { t: 'Chronometer', d: 'Not the same as a chronograph. A watch whose accuracy has been independently tested. Today’s Swiss standard, COSC, allows a mechanical watch to lose four or gain six seconds a day.' },
   'automatic': { t: 'Automatic', d: 'A mechanical watch that winds itself from the motion of the wearer’s arm. Also “self-winding”.' },
   'rotor': { t: 'Rotor', d: 'The weighted half-disc in an automatic watch. It swings as you move and winds the mainspring through a set of gears.' },
-  'quartz': { t: 'Quartz', d: 'A watch regulated by a vibrating quartz crystal and powered by a battery. An ordinary one is ten to a hundred times more accurate than a fine mechanical watch, and has a fraction of the parts.' },
+  'quartz': { t: 'Quartz', d: 'A watch regulated by a vibrating quartz crystal and powered by a battery. An ordinary one is ten times or more as accurate as a fine mechanical watch, and has a fraction of the parts.' },
   'quartz crisis': { t: 'Quartz crisis', d: 'The 1970s and early 80s, when cheap, accurate electronic watches from Japan, America and Hong Kong collapsed the Swiss mechanical industry. Swiss watchmaking jobs fell from about 90,000 to about 30,000.' },
   'ébauche': { t: 'Ébauche', d: 'A movement supplied as a kit or blank by a specialist factory, for a brand to finish, adjust and case. Most “Swiss watch brands” in history did not make their own movements.' },
   'ligne': { t: 'Ligne', d: 'The old French unit still used for movement diameters: one twelfth of a French inch, about 2.26 mm. Written with three ticks: 13‴.' },

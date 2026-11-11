@@ -1,7 +1,7 @@
 /* UNSIGNED — sound. Everything is synthesised with WebAudio: no audio files. */
 (function () {
 'use strict';
-const A = { on: true, ready: false };
+const A = { on: true, ready: false, vol: 0.8 };
 let ctx, master, tickBus, sfxBus, musBus, noise, delay;
 let tickRate = 0, tickVol = 0, tickNext = 0, tickFlip = false, tickTimer = null, tickKind = 'mech';
 let musTimer = null, mood = null, drone = [];
@@ -10,7 +10,7 @@ function init() {
   if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
   const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
   try { ctx = new AC(); } catch (e) { return; }
-  master = ctx.createGain(); master.gain.value = A.on ? 1 : 0; master.connect(ctx.destination);
+  master = ctx.createGain(); master.gain.value = A.on ? A.vol : 0; master.connect(ctx.destination);
   tickBus = ctx.createGain(); tickBus.gain.value = 1; tickBus.connect(master);
   sfxBus = ctx.createGain(); sfxBus.gain.value = 0.9; sfxBus.connect(master);
   musBus = ctx.createGain(); musBus.gain.value = 0.55;
@@ -27,8 +27,10 @@ function init() {
   if (mood) startMusic();
 }
 A.init = init;
-A.toggle = function () { A.on = !A.on; if (master) master.gain.setTargetAtTime(A.on ? 1 : 0, ctx.currentTime, 0.05); try { localStorage.setItem('unsigned.sound', A.on ? '1' : '0'); } catch (e) {} return A.on; };
-try { if (localStorage.getItem('unsigned.sound') === '0') A.on = false; } catch (e) {}
+function applyGain() { if (master) master.gain.setTargetAtTime(A.on ? A.vol : 0, ctx.currentTime, 0.05); }
+A.toggle = function () { A.on = !A.on; applyGain(); try { localStorage.setItem('unsigned.sound', A.on ? '1' : '0'); } catch (e) {} return A.on; };
+A.setVol = function (v) { A.vol = Math.max(0, Math.min(1, v)); applyGain(); try { localStorage.setItem('unsigned.volume', String(A.vol)); } catch (e) {} };
+try { if (localStorage.getItem('unsigned.sound') === '0') A.on = false; const v = parseFloat(localStorage.getItem('unsigned.volume')); if (v >= 0 && v <= 1) A.vol = v; } catch (e) {}
 
 function burst(t, freq, q, vol, dur, bus, type) {
   const src = ctx.createBufferSource(); src.buffer = noise; src.loop = true;
@@ -50,7 +52,7 @@ function schedule() {
   if (tickNext < now) tickNext = now + 0.02;
   while (tickNext < now + 0.12) {
     const v = tickVol * (0.85 + Math.random() * 0.3);
-    if (tickKind === 'quartz') { burst(tickNext, 1500, 2.2, v * 1.4, 0.05, tickBus); tone(tickNext, 190, v * 0.5, 0.05, tickBus); }
+    if (tickKind === 'quartz') { burst(tickNext, 1500, 2.2, v * 0.7, 0.05, tickBus); tone(tickNext, 190, v * 0.25, 0.05, tickBus); }
     else {
       burst(tickNext, tickFlip ? 4600 : 3500, 4, v, 0.022, tickBus);
       burst(tickNext + 0.006, tickFlip ? 7200 : 6100, 6, v * 0.5, 0.012, tickBus);
@@ -62,32 +64,32 @@ function schedule() {
 A.tick = function (bph, vol) {
   if (!bph) { tickRate = 0; return; }
   tickKind = bph === 'quartz' ? 'quartz' : 'mech';
-  tickRate = bph === 'quartz' ? 1 : bph / 3600; tickVol = (vol == null ? 0.5 : vol) * 0.16;
+  tickRate = bph === 'quartz' ? 1 : bph / 3600; tickVol = (vol == null ? 0.5 : vol) * 0.32;
   if (ctx) tickNext = Math.max(tickNext, ctx.currentTime + 0.03);
 };
-A.tickVol = function (vol) { tickVol = vol * 0.16; };
+A.tickVol = function (vol) { tickVol = vol * 0.32; };
 
 /* ---- one-shot effects ---- */
 const SFX = {
-  click(t) { burst(t, 2400, 2, 0.12, 0.03); },
-  soft(t) { burst(t, 900, 1.2, 0.08, 0.05); },
-  page(t) { burst(t, 1900, 0.7, 0.11, 0.22, null, 'highpass'); burst(t + 0.09, 3200, 0.9, 0.07, 0.16); },
-  ratchet(t) { burst(t, 3000, 5, 0.22, 0.02); burst(t + 0.012, 5200, 7, 0.1, 0.012); },
-  bezel(t) { burst(t, 2100, 6, 0.3, 0.025); tone(t, 320, 0.05, 0.03); },
+  click(t) { burst(t, 2400, 2, 0.3, 0.03); },
+  soft(t) { burst(t, 900, 1.2, 0.2, 0.05); },
+  page(t) { burst(t, 1900, 0.7, 0.08, 0.22, null, 'highpass'); burst(t + 0.09, 3200, 0.9, 0.07, 0.16); },
+  ratchet(t) { burst(t, 3000, 5, 0.45, 0.02); burst(t + 0.012, 5200, 7, 0.2, 0.012); },
+  bezel(t) { burst(t, 2100, 6, 0.5, 0.025); tone(t, 320, 0.05, 0.03); },
   note(t) { tone(t, 1318.5, 0.07, 0.5); tone(t + 0.07, 1975.5, 0.05, 0.6); },
   good(t) { tone(t, 784, 0.07, 0.5); tone(t + 0.1, 1174.7, 0.06, 0.6); tone(t + 0.2, 1568, 0.05, 0.9); },
-  bad(t) { tone(t, 196, 0.09, 0.3, null, 'triangle'); tone(t + 0.02, 185, 0.07, 0.35, null, 'triangle'); },
+  bad(t) { tone(t, 196, 0.07, 0.3, null, 'triangle'); tone(t + 0.02, 185, 0.055, 0.35, null, 'triangle'); },
   coin(t) { tone(t, 2637, 0.05, 0.25); tone(t + 0.05, 3520, 0.05, 0.4); burst(t, 6000, 3, 0.05, 0.04); },
-  thup(t) { tone(t, 110, 0.4, 0.16, null, 'sine', 0.008); burst(t, 380, 0.9, 0.3, 0.09, null, 'lowpass'); },
+  thup(t) { tone(t, 110, 0.13, 0.16, null, 'sine', 0.008); burst(t, 380, 0.9, 0.1, 0.09, null, 'lowpass'); },
   lift(t) { burst(t, 1200, 0.6, 0.06, 0.25, null, 'highpass'); },
   whoosh(t) { const src = ctx.createBufferSource(); src.buffer = noise; src.loop = true; const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 0.8; f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(1800, t + 0.5); f.frequency.exponentialRampToValueAtTime(260, t + 1.3); const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.07, t + 0.5); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.4); src.connect(f); f.connect(g); g.connect(sfxBus); src.start(t); src.stop(t + 1.5); },
   bell(t) { [523.25, 1046.5, 1569.7].forEach((f, i) => tone(t, f, 0.06 / (i + 1), 2.2)); },
   chime(t) { [659.25, 830.6, 987.8].forEach((f, i) => tone(t + i * 0.16, f, 0.05, 1.6, musBus)); },
-  gavel(t) { tone(t, 150, 0.4, 0.12, null, 'triangle'); burst(t, 900, 1.5, 0.25, 0.05); },
-  phone(t) { [0, 0.16].forEach(d => { tone(t + d, 880, 0.03, 0.1, null, 'triangle'); tone(t + d, 1108, 0.03, 0.1, null, 'triangle'); }); },
+  gavel(t) { tone(t, 150, 0.16, 0.12, null, 'triangle'); burst(t, 900, 1.5, 0.1, 0.05); },
+  phone(t) { [0, 0.16].forEach(d => { tone(t + d, 880, 0.06, 0.1, null, 'triangle'); tone(t + d, 1108, 0.06, 0.1, null, 'triangle'); }); },
   beep(t) { tone(t, 1000, 0.05, 0.25, null, 'sine'); },
-  snip(t) { burst(t, 5200, 3, 0.1, 0.03); },
-  open(t) { burst(t, 500, 0.8, 0.14, 0.18, null, 'lowpass'); burst(t + 0.12, 2600, 2, 0.06, 0.05); }
+  snip(t) { burst(t, 5200, 3, 0.25, 0.03); },
+  open(t) { burst(t, 500, 0.8, 0.3, 0.18, null, 'lowpass'); burst(t + 0.12, 2600, 2, 0.06, 0.05); }
 };
 A.sfx = function (name, delayS) {
   if (!ctx || ctx.state !== 'running') return;

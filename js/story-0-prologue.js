@@ -47,7 +47,7 @@ G.scene('pro_shop', [
   n('It has stopped. Seventeen minutes past four.'),
   d('claire', 'She wore that every single day. She’d push it up her arm to wash the dishes sooner than take it off.'),
   me('What make is it?'),
-  d('claire', 'It isn’t. Look at it. There’s nothing on it. I asked her once, I was about twelve, everybody at school had a Swatch. What’s the brand, Maman? And she said: “It’s signed. You’re just not reading it right.”'),
+  d('claire', 'It isn’t. Look at it. There’s nothing on it. I asked her once, I was about twelve, everybody at school had a Timex. What’s the brand, Maman? And she said: “It’s signed. You’re just not reading it right.”'),
   d('claire', 'She liked riddles a great deal more than she liked answers.'),
   n('Her loupe is on the bench where she left it. You pick it up.'),
   hide(),

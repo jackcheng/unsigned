@@ -44,7 +44,7 @@ window.Lineage = {
     {
       id: 'trench', fam: 'origins', year: 1915, name: 'The trench watch', maker: 'many makers',
       line: 'War solders wire lugs to a pocket watch, and men never go back.',
-      text: 'Officers in the First World War needed both hands and the exact time: barrages were timed to the minute. Small pocket watches gained soldered wire lugs, luminous radium numerals, and sometimes a metal grille to guard the glass. The men who survived came home wearing them. By about 1930 wristwatches were outselling pocket watches, and the “wristlet” was no longer a woman’s thing.',
+      text: 'Officers in the First World War needed both hands and the exact time: barrages were timed to the minute. Small pocket watches gained soldered wire lugs, luminous radium numerals, and sometimes a metal grille to guard the glass. The men who survived came home wearing them. By the 1930s wristwatches were outselling pocket watches, and the “wristlet” was no longer a woman’s thing.',
       from: ['wristlet'],
       cfg: { mm: 34, metal: 'silver', lugs: 'wire', bezel: { type: 'thin' }, crown: { pos: 3, kind: 'onion' }, dial: { color: '#f4f0e4', finish: 'enamel', track: 'railroad', indices: 'trench', red12: true, lume: 'radium', ink: '#222', numSize: 0.21, sub: [{ pos: 6, r: 0.24 }] }, hands: { style: 'cathedral', color: 'blued', lume: 'radium', seconds: 'sub' }, strap: { type: 'leather', color: '#6a4a2c' }, wear: { cracks: 3 } }
     },
@@ -60,7 +60,7 @@ window.Lineage = {
     {
       id: 'www', fam: 'field', year: 1945, name: 'W.W.W. “Dirty Dozen”', maker: 'twelve makers',
       line: 'One British specification, twelve makers, about 150,000 watches.',
-      text: 'Late in the war the British Ministry of Defence wrote a single specification, Watch, Wrist, Waterproof, and twelve makers built to it: Buren, Cyma, Eterna, Grana, Jaeger-LeCoultre, Lemania, Longines, IWC, Omega, Record, Timor and Vertex. Black dial, railway minute track, small seconds, luminous hands, and the broad arrow of Crown property. Collectors later nicknamed them the Dirty Dozen, after the film.',
+      text: 'Late in the war the British War Office wrote a single specification, Watch, Wristlet, Waterproof, and twelve makers built to it: Buren, Cyma, Eterna, Grana, Jaeger-LeCoultre, Lemania, Longines, IWC, Omega, Record, Timor and Vertex. Black dial, railway minute track, small seconds, luminous hands, and the broad arrow of Crown property. Collectors later nicknamed them the Dirty Dozen, after the film.',
       from: ['trench'],
       cfg: { mm: 37, metal: 'chrome', bezel: { type: 'smooth' }, dial: { color: '#15140f', track: 'railroad', indices: 'www', ink: '#e9e4d2', lume: 'radium', pips: true, numSize: 0.19, logo: 'broadarrow', logoY: -0.2, sub: [{ pos: 6, r: 0.27 }] }, hands: { style: 'pencil', color: 'white', lume: 'radium', seconds: 'sub' }, strap: { type: 'nato', color: '#5d5a43' } }
     },
@@ -74,7 +74,7 @@ window.Lineage = {
     {
       id: 'khaki', fam: 'field', year: 1964, name: 'US-issue field watch', maker: 'Benrus, Hamilton and others',
       line: 'The Vietnam-era field watch: small, plain, and meant to be used up.',
-      text: 'American specifications of the 1960s, MIL-W-46374 for general issue and GG-W-113 for pilots, produced small matte watches with a 24-hour inner scale and hacking seconds, made by Benrus, Hamilton and others. Some were built to be thrown away rather than repaired. Hamilton later sold the same look to civilians as the Khaki, and it is still the template for most field watches made today.',
+      text: 'American specifications of the 1960s, MIL-W-46374 for general issue and the related GG-W-113, produced small matte watches with a 24-hour inner scale and hacking seconds, made by Benrus, Hamilton and others. Some were built to be thrown away rather than repaired. Hamilton later sold the same look to civilians as the Khaki, and it is still the template for most field watches made today.',
       from: ['a11'],
       cfg: { mm: 34, metal: 'titanium', bezel: { type: 'smooth' }, dial: { color: '#121311', track: 'ticks', indices: 'arabic', ink: '#ecebe2', numSize: 0.17, numAt: 0.68, lume: 'tritium', pips: true }, hands: { style: 'syringe', color: 'white', lume: 'tritium', seconds: 'center', secColor: 'white' }, strap: { type: 'nato', color: '#565a3c' } }
     },

@@ -244,7 +244,7 @@ games.regulate = function (o) {
     }
     $$('[data-d]', ov).forEach(b => b.onclick = () => { const d = +b.dataset.d; rate += d + (Math.random() - 0.5) * (Math.abs(d) > 1 ? 1.2 : 0.3); Sound.sfx('ratchet'); status(); });
     $$('[data-b]', ov).forEach(b => b.onclick = () => { const d = +b.dataset.b; beat = Math.abs(beat + d + (Math.random() - 0.5) * 0.05); Sound.sfx('ratchet'); status(); });
-    const kd = e => { if (e.key === 'ArrowLeft') { rate -= e.shiftKey ? 5 : 0.6; status(); } if (e.key === 'ArrowRight') { rate += e.shiftKey ? 5 : 0.6; status(); } };
+    const kd = e => { const k = e.key.toLowerCase(); if (e.key === 'ArrowLeft' || k === 'r') { rate -= e.shiftKey || k === 'r' ? 5 : 0.6; status(); } if (e.key === 'ArrowRight' || k === 'a') { rate += e.shiftKey || k === 'a' ? 5 : 0.6; status(); } };
     document.addEventListener('keydown', kd);
     function frame(t) {
       if (dead) return;
