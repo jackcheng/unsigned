@@ -1,0 +1,15 @@
+{
+  "name": "Unsigned — Act I: The Empty Roll",
+  "short_name": "Unsigned",
+  "description": "A narrative game about watches, and the people nobody put on the dial.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1310",
+  "theme_color": "#0b1310",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

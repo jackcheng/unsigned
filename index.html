@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unsigned — Act I: The Empty Roll</title>
+<meta name="description" content="A narrative game about watches, and the people nobody put on the dial.">
+<script src="js/fonts.js"></script>
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="theme-color" content="#0b1310">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Unsigned">
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+    <div id="bg" class="bgl"></div>
+    <div id="bg2" class="bgl"></div>
+    <div id="shade"></div>
+    <div id="prop"></div>
+    <div id="hud">
+      <div class="place"></div>
+      <div class="tools">
+        <span class="cash" title="Money in hand"></span>
+        <button data-tool="carnet" title="Her notebook (C)">Carnet</button>
+        <button data-tool="roll" title="The watch roll (R)">Roll</button>
+        <button data-tool="lineage" title="The lineage board (L)">Lineage</button>
+        <button class="snd" title="Sound on / off" aria-label="Sound"><svg viewBox="0 0 20 20" width="16" height="16"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor"/><path class="wave" d="M12.5 6.5a5 5 0 0 1 0 7M14.6 4.2a8 8 0 0 1 0 11.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path class="mute" d="M12.5 7.5l5 5M17.5 7.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+        <button class="menu" title="Menu (Esc)" aria-label="Menu"><svg viewBox="0 0 20 20" width="16" height="16"><path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
+    </div>
+    <div id="talk"><div id="dlg"></div><div id="choices"></div></div>
+  </div>
+  <div id="panel"></div>
+  <div id="overlay"></div>
+  <div id="toasts"></div>
+  <div id="fade"></div>
+</div>
+<noscript><p style="color:#f1e9d6;font-family:serif;padding:2rem">This game needs JavaScript.</p></noscript>
+
+<script src="js/watch.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/scenes-a.js"></script>
+<script src="js/scenes-b.js"></script>
+<script src="js/scenes-c.js"></script>
+<script src="js/lineage.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/panels.js"></script>
+<script src="js/games.js"></script>
+<script src="js/data.js"></script>
+<script src="js/story-0-prologue.js"></script>
+<script src="js/story-1-london.js"></script>
+<script src="js/story-2-paris.js"></script>
+<script src="js/story-3-marseille.js"></script>
+<script src="js/story-4-newyork.js"></script>
+<script src="js/story-5-tokyo.js"></script>
+<script src="js/story-6-hongkong.js"></script>
+<script src="js/story-7-jura.js"></script>
+<script src="js/main.js"></script>
+<script>if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>
