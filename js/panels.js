@@ -172,6 +172,7 @@ function menu(root, arg, close) {
       <button class="btn" data-a="sound">Sound: ${Sound.on ? 'on' : 'off'}</button>
       <label class="vol"><span>Volume</span><input type="range" min="0" max="100" step="5" value="${Math.round(Sound.vol * 100)}" aria-label="Volume"></label>
       <button class="btn" data-a="motion">Scene motion: ${G.motion.rate > 0 ? 'on' : 'off'}</button>
+      <button class="btn" data-a="code">Save code</button>
       <button class="btn" data-a="title">Back to the title</button>
       <p class="mnote">The game saves by itself at the start of every scene.</p>`;
     const vr = $('.vol input', wrap);
@@ -183,7 +184,22 @@ function menu(root, arg, close) {
       else if (a === 'sound') { Sound.init(); const on = Sound.toggle(); $('#hud .snd').classList.toggle('off', !on); main(); }
       else if (a === 'motion') { G.setMotion(G.motion.rate > 0 ? 0 : 20, true); main(); }
       else if (a === 'log') log();
+      else if (a === 'code') code();
       else if (a === 'title') { location.reload(); }
+    });
+  }
+  function code() {
+    const c = G.saveCode();
+    wrap.innerHTML = `<h2>Save code</h2><p class="codenote">${c ? 'This is your game as of the start of this scene. Keep a copy somewhere safe, in Notes or an email to yourself. To pick up from it, on this phone after reinstalling or in another browser, choose <i>Have a save code?</i> on the title screen and paste it in.' : 'There is no saved game yet. One is made at the start of every scene.'}</p>
+      ${c ? `<textarea class="codebox" readonly rows="4" spellcheck="false">${c}</textarea>` : ''}
+      <div class="codeacts">${c ? '<button class="btn gold" data-a="copy">Copy</button>' : ''}<button class="btn" data-a="back">Back</button></div>`;
+    const box = $('.codebox', wrap);
+    if (box) box.onclick = () => box.select();
+    $$('button', wrap).forEach(b => b.onclick = () => {
+      if (b.dataset.a === 'back') return main();
+      const done = () => { b.textContent = 'Copied'; Sound.sfx('soft'); setTimeout(() => { b.textContent = 'Copy'; }, 1800); };
+      const fallback = () => { box.focus(); box.select(); box.setSelectionRange(0, c.length); try { if (document.execCommand('copy')) return done(); } catch (e) {} b.textContent = 'Selected: copy it'; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(c).then(done, fallback); else fallback();
     });
   }
   function log() {

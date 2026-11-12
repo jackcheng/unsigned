@@ -23,11 +23,27 @@ function title() {
   ov.innerHTML = `<div class="start"><div class="start-watch">${Watch.svg(G.heirloomCfg(ok ? saved : null), { live: true, vb: '-150 -200 300 400' })}</div>
     <div class="start-text"><h1>UNSIGNED</h1><p class="tag">A game about watches, and the people nobody put on the dial.</p><div class="act">Act I · The Empty Roll</div>
     <div class="start-btns">${ok ? '<button class="btn gold" data-a="cont">Continue</button>' : ''}<button class="btn${ok ? '' : ' gold'}" data-a="new">${ok ? 'Begin again' : 'Begin'}</button></div>
-    <p class="start-fine">About ninety minutes. It saves by itself. Best with sound.<br>Click, or press <b>Space</b>, to go on. Underlined words can be clicked.</p></div></div>`;
+    <p class="start-fine">About ninety minutes. It saves by itself. Best with sound.<br>Click, or press <b>Space</b>, to go on. Underlined words can be clicked.</p><button class="linkbtn" data-a="code">Have a save code?</button></div></div>`;
   $$('[data-a]', ov).forEach(b => b.onclick = () => {
+    if (b.dataset.a === 'code') return paste();
     if (b.dataset.a === 'cont') { G.s = saved; if (!G.s.news) G.s.news = { nodes: {}, terms: {}, pages: {}, roll: {} }; begin(saved.scene, true); }
     else { if (ok && !confirm('Start again from the beginning? Your saved game will be replaced.')) return; G.wipe(); G.s = G.fresh(); begin(FIRST, false); }
   });
+}
+
+function paste() {
+  const box = $('.start-text', $('#overlay'));
+  const had = G.load() && G.load().scene;
+  box.innerHTML = `<h2 class="paste-h">Have a save code?</h2><p class="codenote">Paste the code you copied from <i>Menu → Save code</i>.${had ? ' It will replace the game saved here.' : ''}</p>
+    <textarea class="codebox" rows="4" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="UNSIGNED1.…"></textarea>
+    <p class="codeerr"></p>
+    <div class="codeacts"><button class="btn gold" data-a="load">Load it</button><button class="btn" data-a="back">Back</button></div>`;
+  const ta = $('.codebox', box), err = $('.codeerr', box);
+  $('[data-a="back"]', box).onclick = () => title();
+  $('[data-a="load"]', box).onclick = () => {
+    if (G.useCode(ta.value)) { title(); return; }
+    err.textContent = ta.value.trim() ? 'That code didn’t work. Check it was copied whole, from UNSIGNED1. to the end.' : 'Paste the code into the box first.';
+  };
 }
 
 /* ?scene=id jumps straight to a scene with a plausible mid-game state (for testing) */

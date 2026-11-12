@@ -25,6 +25,20 @@ G.fresh = function () {
 G.save = function () { try { localStorage.setItem(KEY, JSON.stringify(G.snap)); } catch (e) {} };
 G.load = function () { try { const t = localStorage.getItem(KEY); return t ? JSON.parse(t) : null; } catch (e) { return null; } };
 G.wipe = function () { try { localStorage.removeItem(KEY); } catch (e) {} };
+/* save codes: the saved game as text, to carry it to another browser or across a reinstall */
+G.saveCode = function () {
+  try { const t = localStorage.getItem(KEY); if (!t) return ''; return 'UNSIGNED1.' + btoa(unescape(encodeURIComponent(t))); } catch (e) { return ''; }
+};
+G.useCode = function (code) {
+  try {
+    const m = String(code || '').replace(/\s+/g, '').match(/^UNSIGNED1\.([A-Za-z0-9+/=]+)$/);
+    if (!m) return false;
+    const t = decodeURIComponent(escape(atob(m[1]))), s = JSON.parse(t);
+    if (!s || typeof s !== 'object' || !s.scene || !G.scenes[s.scene]) return false;
+    localStorage.setItem(KEY, t);
+    return true;
+  } catch (e) { return false; }
+};
 G.money = n => (n < 0 ? '−$' : '$') + Math.abs(Math.round(n)).toLocaleString('en-US');
 
 /* ---------------- text ---------------- */

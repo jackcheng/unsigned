@@ -708,3 +708,20 @@ svg.links path.ghost{stroke-dasharray:3 5;opacity:.22}
   .ins-tabs button,.book-tabs button{min-height:36px}
   #hud .tools button{min-height:34px}
 }
+
+/* save codes */
+.linkbtn{font:italic .98rem var(--serif);color:var(--brass2);border-bottom:1px dotted var(--brass);margin-top:.9rem;padding:.3rem 0}
+.paste-h{font:500 2.2rem var(--display);margin:0 0 .4rem}
+.codenote{font:italic 1.02rem var(--serif);color:#d9d0bc;line-height:1.45;max-width:30rem;margin:0 0 .8rem}
+.menuwrap .codenote{text-align:center}
+.codebox{display:block;width:min(30rem,100%);font:400 16px/1.35 ui-monospace,Menlo,monospace;color:var(--cream);background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:.3rem;padding:.6rem .7rem;resize:none;word-break:break-all;outline:none}
+.codebox:focus{border-color:var(--brass)}
+.codeerr{font:italic .95rem var(--serif);color:#e58a72;min-height:1.2rem;margin:.4rem 0}
+.codeacts{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:inherit}
+.menuwrap .codeacts{justify-content:center;margin-top:.6rem}
+.menuwrap .codeacts .btn{width:auto;min-width:9rem}
+.start-text .codeacts .btn{min-width:9rem}
+@media (max-width:900px) and (orientation:portrait){ .start-text .codebox{margin:0 auto} .start-text .codeacts{justify-content:center} .codenote{margin-left:auto;margin-right:auto} }
+.menuwrap .codebox{width:min(30rem,calc(100vw - var(--sal) - var(--sar) - 2.4rem));margin:0 auto;font-size:14px}
+@supports (-webkit-touch-callout:none){.menuwrap .codebox{font-size:16px}}
+.menuwrap .codenote{padding:0 1rem}
