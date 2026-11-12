@@ -308,7 +308,9 @@ document.addEventListener('click', e => {
   if (e.target.closest('#hud') || e.target.closest('#overlay') || e.target.closest('#choices') || e.target.closest('button')) return;
   if (e.target.closest('#stage')) tryAdvance();
 });
+const upright = window.matchMedia ? window.matchMedia('(orientation:portrait)') : { matches: false };
 document.addEventListener('keydown', e => {
+  if (upright.matches) return;   // the turn-it screen is covering the game
   if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
   if (e.key === 'Control') { G.ff = true; if (advance && !G.modal) tryAdvance(); }
   if (G.modal) { if (e.key === 'Escape' && G.closePanel) G.closePanel(); return; }

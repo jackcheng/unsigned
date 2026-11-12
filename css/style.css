@@ -493,22 +493,6 @@ svg.links path.ghost{stroke-dasharray:3 5;opacity:.22}
 .p-box{display:grid;grid-template-columns:repeat(6,1fr);gap:.5rem;padding:1rem;background:linear-gradient(180deg,#6b4a2c,#4a2f1a);border-radius:.3rem;box-shadow:0 24px 50px rgba(0,0,0,.7),inset 0 0 0 3px rgba(0,0,0,.3);width:min(40rem,80vw)}
 .p-box svg{width:100%;height:auto;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
 
-/* ---------- narrow screens ---------- */
-/* stacked layouts for narrow screens held upright (a phone in landscape keeps the side-by-side layouts) */
-@media (max-width:900px) and (orientation:portrait){
-  .ins{grid-template-columns:1fr;grid-template-rows:minmax(0,1.1fr) minmax(0,1fr);padding:.8rem}
-  .ins-watch{width:min(100%,46vh)}
-  .hg,.wind,.bz,.reg,.st,.start{flex-direction:column;gap:1.2rem;text-align:center}
-  .start-btns{align-items:center}
-  .reg-left{width:min(44vh,70vw)}
-  .wind-watch,.bz-watch{width:min(44vh,74vw)}
-  .rolldetail{flex-direction:column}
-  .gloss{columns:1}
-  .spread{flex-direction:column;overflow-y:auto}.spread::after{display:none}.leaf{overflow:visible}
-  #dlg .portrait{width:5.4rem;height:5.4rem}
-  #hud .tools button{padding:.45rem .6rem;letter-spacing:.1em}
-  .choice small{display:none}
-}
 @media (max-height:620px){
   #prop{top:6vh;height:40vh}
   #dlg .box{min-height:6.4rem;padding:.8rem 1.2rem 1.1rem}
@@ -521,102 +505,15 @@ svg.links path.ghost{stroke-dasharray:3 5;opacity:.22}
 .ins-stage.dark .ins-watch::before{display:none}
 
 /* ---------- phones ---------- */
+/* The game plays in landscape only; an upright screen gets the turn-it screen at the end of this file. */
 /* the movement's strap would run over its caption */
 @media (max-width:900px),(max-height:500px){
   .reg-mov{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%)}
-}
-/* a watch drawn with its strap running off the box: fade the strap out instead of letting it cover the words below */
-@media (max-width:900px) and (orientation:portrait){
-  .ins-watch,.hg-watch,.wind-watch,.bz-watch,.start-watch{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 14%,#000 86%,transparent 100%)}
-}
-@media (max-width:600px) and (orientation:portrait){
-  /* hud: tools on top, place underneath */
-  #hud{flex-direction:column-reverse;align-items:stretch;gap:.5rem;padding:calc(var(--sat) + .6rem) calc(var(--sar) + .8rem) .6rem calc(var(--sal) + .8rem)}
-  #hud .tools{justify-content:flex-end;gap:.35rem}
-  #hud .tools button{padding:.5rem .55rem;letter-spacing:.08em;font-size:.68rem}
-  #hud .cash{margin-right:auto;font-size:.78rem}
-  #hud .place{letter-spacing:.16em;font-size:.7rem}
-  #hud .place span{display:inline;margin:0 0 0 .5rem;font-size:.66rem}
-  #prop{top:calc(var(--sat) + 6.2rem);height:38vh}
-  #prop.low{top:calc(var(--sat) + 8rem);height:32vh}
-  #toasts{top:calc(var(--sat) + 5.6rem);right:calc(var(--sar) + .8rem)}
-  /* dialogue: portrait sits on the box's top edge so the text gets the full width */
-  #talk{bottom:calc(var(--sab) + .8rem);width:calc(100vw - var(--sal) - var(--sar) - 1.2rem)}
-  #dlg{flex-direction:column;align-items:flex-start;gap:0}
-  #dlg .portrait,#dlg.choosing .portrait{width:4.4rem;height:4.4rem;margin:0 0 -1.4rem .9rem;position:relative;z-index:1}
-  #dlg .portrait+.box .who{padding-left:5.1rem;min-height:1.6rem}
-  #dlg .box{width:100%;min-height:7rem;padding:.9rem 1.1rem 1.3rem}
-  #dlg .txt{font-size:1.2rem;line-height:1.45}
-  #dlg.k-m .bubble{font-size:1.05rem}
-  #dlg .slip{padding:1rem 1.2rem}
-  #dlg .slip .txt{font-size:1.5rem;line-height:1.8rem}
-  .choice{font-size:1.08rem;padding:.6rem .9rem;gap:.7rem}
-  /* carnet */
-  .book{width:calc(100vw - var(--sal) - var(--sar) - 1rem);height:calc(100vh - var(--sat) - var(--sab) - 1.6rem);height:calc(100dvh - var(--sat) - var(--sab) - 1.6rem)}
-  .book-tabs{padding-left:0;gap:.2rem;padding-right:5.4rem}
-  .book-tabs button{padding:.6rem .6rem;letter-spacing:.1em;font-size:.66rem}
-  .book .close{padding:.5rem .9rem;font-size:.68rem;top:-.1rem}
-  .leaf{padding:1.2rem 1.2rem}
-  /* roll: the strip scrolls sideways, like unrolling it */
-  .rollwrap{width:calc(100vw - var(--sal) - var(--sar) - 1rem);padding:1rem 0}
-  .rollwrap h2{font-size:1.9rem}
-  .roll{justify-content:flex-start;overflow-x:auto;scroll-snap-type:x proximity;padding:1.2rem .8rem .9rem}
-  .pocket{flex:0 0 5.6rem;scroll-snap-align:start}
-  .pocket .pw{height:min(12rem,22vh)}
-  .pocket .tag{font-size:1.05rem}
-  .rolldetail{gap:1rem;margin-top:1rem}
-  /* lineage */
-  .linhead{flex-wrap:wrap;gap:.3rem 1rem;padding:.8rem 1rem .5rem}
-  .linhead h2{font-size:1.8rem}
-  .linhelp{order:5;width:100%;margin:0;font-size:.85rem}
-  .linhead .close{margin-left:auto}
-  .linrows,.linrow{width:5.6rem}
-  .linrow{padding-left:.7rem;font-size:.56rem;letter-spacing:.12em}
-  .lincard{flex-direction:column;gap:.6rem;padding:.8rem 1rem 1rem;max-height:46vh}
-  .cthumb{width:6rem}
-  .ctext h3{font-size:1.5rem}
-  /* games */
-  .ins{grid-template-rows:minmax(0,1fr) minmax(0,1fr);padding:.6rem}
-  .ins-watch{width:min(100%,40vh)}
-  .ins-side{padding:.9rem .9rem .8rem}
-  .ins-head h2{font-size:1.5rem}
-  .hg{width:calc(100vw - var(--sal) - var(--sar) - 2rem);gap:.6rem;padding:1rem 0}
-  .hg-watch{width:min(13rem,46vw,30vh)}
-  .hg-seller{min-height:0;text-align:left;gap:.8rem}
-  .hg-seller .portrait{width:4.6rem;height:4.6rem}
-  .hg-say{font-size:1.15rem}
-  .hg-price{margin:.7rem 0;padding:.6rem 0}
-  .hg-price b{font-size:2.2rem}
-  .hg-points,.hg-acts{justify-content:center}
-  .wind,.bz,.st,.reg{width:calc(100vw - var(--sal) - var(--sar) - 2rem);padding:1rem 0}
-  .wind-watch,.bz-watch{width:min(40vh,76vw)}
-  .wind-say,.bz-say,.st-say{font-size:1.2rem;min-height:4.4rem;margin:.5rem 0}
-  .wind-hint{margin:.6rem auto 0}
-  .spring{margin:0 auto}
-  .bz-ctl,.bz-q{justify-content:center}
-  .reg-left{width:min(30vh,62vw)}
-  .reg-intro{font-size:1rem}
-  .reads{justify-content:center;gap:1.4rem}
-  .ctl{justify-content:center}
-  .ctl span{width:auto;margin-right:.3rem}
-  .st-rig{width:min(70vw,40vh)}
-  .st-rig{overflow:hidden}.st-pad{top:-90%}
-  .start{width:calc(100vw - var(--sal) - var(--sar) - 2rem);gap:.6rem;padding:1.2rem 0}
-  .start-watch{width:min(56vw,34vh)}
-  .start-text .tag{font-size:1.2rem;margin:.6rem auto .4rem}
-  .start-text .act{margin-bottom:1.4rem}
-  .start-fine{margin:1.2rem auto 0}
-  .nm-card{padding:1.6rem 1.3rem}
-  .end{width:calc(100vw - var(--sal) - var(--sar) - 1.6rem)}
-  .e-roll{overflow-x:auto;justify-content:flex-start}
-  .e-slot{flex:0 0 4.4rem}
-  .e-stats{gap:1.2rem 1.8rem}
 }
 /* a phone on its side: little height, so shrink type a step and keep things side by side */
 @media (orientation:landscape) and (max-height:500px){
   html{font-size:13px}
   #hud{padding:calc(var(--sat) + .6rem) calc(var(--sar) + 1rem) .6rem calc(var(--sal) + 1rem)}
-  #hud .place span{display:inline;margin:0 0 0 .6rem}
   #prop{top:calc(var(--sat) + 3.6rem);height:44vh}
   #prop.low{top:calc(var(--sat) + 5rem);height:38vh}
   #toasts{top:calc(var(--sat) + 3.4rem)}
@@ -651,13 +548,16 @@ svg.links path.ghost{stroke-dasharray:3 5;opacity:.22}
   .menuwrap .btn{width:15rem;padding:.7rem 1rem}
   .logbox{max-height:62vh}
   /* games */
-  .ins{grid-template-columns:minmax(0,1fr) 21rem;padding:.5rem .8rem}
+  .ins{grid-template-columns:minmax(0,1fr) 22rem;padding:.5rem .8rem}
   .ins-watch{width:min(100%,calc(100vh - var(--sat) - var(--sab) - 1rem))}
   .ins-side{padding:.8rem .9rem .7rem}
   .ins-head h2{font-size:1.45rem}
   .ins-head p{margin:.2rem 0 .5rem}
   .ins-tabs{margin-bottom:.4rem}
   .ins-hint{min-height:0;font-size:.95rem}
+  .ins-foot{gap:.5rem}
+  .ins-foot .btn{letter-spacing:.08em;padding:.6rem .8rem;white-space:nowrap}
+  .ins-foot .btn.hintbtn{border:0;padding:.6rem 0;background:none;font:italic 1.05rem var(--serif);letter-spacing:0;text-transform:none;color:var(--brass2)}
   .hg{gap:1.8rem;padding:.6rem 0}
   .hg-watch{width:min(14rem,26vw,62vh)}
   .hg-seller{min-height:0}
@@ -702,7 +602,7 @@ svg.links path.ghost{stroke-dasharray:3 5;opacity:.22}
   .e-slot svg{height:min(13rem,34vh)}
 }
 /* phones: keep the small tracked capitals readable and their buttons big enough to tap */
-@media (max-width:600px){
+@media (max-width:600px),(orientation:landscape) and (max-height:500px){
   .btn,.btn.small,.ins-foot .btn,.ctl button,#hud .tools button,.book-tabs button,.ins-tabs button,.book .close{font-size:max(11.5px,.72rem)}
   .leaf h3,.ins-head p,.note b,.ctl span{font-size:max(11px,.7rem)}
   .ins-tabs button,.book-tabs button{min-height:36px}
@@ -721,7 +621,27 @@ svg.links path.ghost{stroke-dasharray:3 5;opacity:.22}
 .menuwrap .codeacts{justify-content:center;margin-top:.6rem}
 .menuwrap .codeacts .btn{width:auto;min-width:9rem}
 .start-text .codeacts .btn{min-width:9rem}
-@media (max-width:900px) and (orientation:portrait){ .start-text .codebox{margin:0 auto} .start-text .codeacts{justify-content:center} .codenote{margin-left:auto;margin-right:auto} }
 .menuwrap .codebox{width:min(30rem,calc(100vw - var(--sal) - var(--sar) - 2.4rem));margin:0 auto;font-size:14px}
 @supports (-webkit-touch-callout:none){.menuwrap .codebox{font-size:16px}}
 .menuwrap .codenote{padding:0 1rem}
+
+/* ---------- landscape only ---------- */
+/* iPhone ignores an orientation lock from a web app, so an upright screen is asked to turn */
+#turn{display:none}
+@media (orientation:portrait){
+  #turn{display:flex;position:fixed;inset:0;z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:1.4rem;text-align:center;
+    padding:calc(var(--sat) + 2rem) calc(var(--sar) + 2rem) calc(var(--sab) + 2rem) calc(var(--sal) + 2rem);
+    background:radial-gradient(110% 80% at 50% 40%,#1d3830 0,#0e1815 60%,#080d0b 100%)}
+  #turn svg{width:min(9rem,34vw);height:auto;color:var(--brass2)}
+  #turn .ph{transform-origin:60px 60px;animation:turnit 2.8s cubic-bezier(.6,0,.3,1) infinite}
+  #turn h2{font:500 2rem var(--display);letter-spacing:.3em;margin:0 -.3em 0 0;color:var(--cream)}
+  #turn p{font:italic 1.2rem/1.45 var(--serif);color:#d9d0bc;margin:0;max-width:22rem}
+  #turn .t-win{display:none}
+  #turn small{font:500 .72rem/1.6 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mut);max-width:20rem}
+}
+@media (orientation:portrait) and (hover:hover) and (pointer:fine){
+  #turn .t-phone,#turn small{display:none}
+  #turn .t-win{display:block}
+}
+@keyframes turnit{0%,18%{transform:rotate(0)}55%,82%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
+@media (prefers-reduced-motion:reduce){#turn .ph{animation:none;transform:rotate(-90deg)}}

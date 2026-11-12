@@ -10,6 +10,8 @@ Open `index.html` in a browser. There is no build step and no server; everything
 
 Served over HTTPS it also installs as a home screen app (`manifest.webmanifest`, `icons/`) and plays offline: `sw.js` caches every file on first load. When you change or add a file, bump `CACHE` in `sw.js` and keep its file list in step, or installed copies will keep the old version.
 
+It plays in landscape only. A phone held upright is asked to turn (iPhone ignores an orientation lock from a web app, so the page does the asking), and there are no upright layouts to maintain.
+
 About ninety minutes. It saves by itself at the start of every scene (in the browser's local storage). Best with sound.
 
 ## Controls
