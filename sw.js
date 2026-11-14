@@ -1,4 +1,4 @@
-const CACHE = 'unsigned-v6';
+const CACHE = 'unsigned-v7';
 const FILES = [
   './',
   './index.html',

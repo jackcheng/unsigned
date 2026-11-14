@@ -13,6 +13,13 @@ const VB = 150, vbStr = `-${VB} -${VB} ${VB * 2} ${VB * 2}`;
 /* =====================================================================
    INSPECT — the loupe
    ===================================================================== */
+/* On a touch screen, the sentence of an intro that says how to use the mouse is swapped for how to use a finger. */
+const TOUCH_HOW = 'Drag beside the loupe to move it over the watch, and tap when something catches your eye.';
+function touchIntro(t) {
+  if (!t) return TOUCH_HOW;
+  if (!/\bclick/i.test(t)) return t;
+  return t.split(/(?<=[.!?])\s+/).filter(x => !/\bclick/i.test(x)).concat(TOUCH_HOW).join(' ');
+}
 const VIEWNAME = { dial: 'Dial', uv: 'In the dark', back: 'Caseback', inside: 'Inside the back', movement: 'Movement' };
 games.inspect = function (id, o) {
   o = o || {};
@@ -66,12 +73,11 @@ games.inspect = function (id, o) {
       notes.insertBefore(d, notes.firstChild);
     }
     avail.forEach(ob => { if (found[ob.id]) addNote(ob, false); });
-    function move(e) {
+    /* aim(px, py): put the loupe over that point of the watch (px across its box) */
+    let at = null;
+    function aim(px, py) {
       const r = stage.getBoundingClientRect(); if (!r.width) return;
-      const px = e.clientX - r.left, py = e.clientY - r.top, S = r.width;
-      const inside = px > -20 && py > -20 && px < S + 20 && py < S + 20;
-      loupe.classList.toggle('on', inside);
-      const sr = loupe.parentNode.getBoundingClientRect();
+      const S = r.width, sr = loupe.parentNode.getBoundingClientRect();
       loupe.style.left = (r.left - sr.left) + 'px'; loupe.style.top = (r.top - sr.top) + 'px';
       loupe.style.transform = `translate(${px - LR}px,${py - LR}px)`;
       lin.style.width = lin.style.height = (S * Z) + 'px';
@@ -81,9 +87,16 @@ games.inspect = function (id, o) {
       const iv = inView();
       for (let i = 0; i < iv.length; i++) { const ob = iv[i]; if (!found[ob.id] && Math.hypot(ux - ob.at[0], uy - ob.at[1]) < (ob.r || 0.16) * 1.15) { hot = ob; break; } }
       loupe.classList.toggle('hot', !!hot);
+      at = [px / S, py / S];
     }
-    function click(e) {
-      move(e);
+    function move(e) {
+      const r = stage.getBoundingClientRect(); if (!r.width) return;
+      const px = e.clientX - r.left, py = e.clientY - r.top, S = r.width;
+      const inside = px > -20 && py > -20 && px < S + 20 && py < S + 20;
+      loupe.classList.toggle('on', inside);
+      aim(px, py);
+    }
+    function note() {
       if (hot) {
         const ob = hot; found[ob.id] = 1; hot = null; lastFind = Date.now(); hintBtn.style.visibility = 'hidden';
         Sound.sfx('note'); addNote(ob, true); render(); loupe.classList.remove('hot');
@@ -91,10 +104,42 @@ games.inspect = function (id, o) {
         hintEl.innerHTML = count() >= avail.length ? 'That is everything this watch has to say.' : (inView().every(x => found[x.id]) ? 'Nothing more on this side. Try another view.' : 'Noted.');
       } else { Sound.sfx('soft'); loupe.classList.add('miss'); setTimeout(() => loupe.classList.remove('miss'), 250); }
     }
-    const stg = $('.ins-stage', ov);
-    stg.addEventListener('pointermove', move);
-    stg.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') move(e); });
-    stg.addEventListener('click', click);
+    /* Touch: a finger on the loupe would hide the middle of the glass. So the loupe is not under the finger: a drag anywhere
+       on the bench moves it by the same amount, and a tap notes what the glass shows. The mouse carries it as before. */
+    const stg = $('.ins-stage', ov), clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    let drag = null, lastTouch = 0, byTouch = false;
+    const intro0 = hintEl.innerHTML;
+    function touchOn() {
+      if (byTouch) return; byTouch = G.touch = true;
+      if (hintEl.innerHTML === intro0) hintEl.innerHTML = G.fmt(touchIntro(o.intro));
+      const S = stage.getBoundingClientRect().width; loupe.classList.add('on'); aim(S / 2, S / 2);
+    }
+    function reaim() { if (!byTouch || !at) return; const S = stage.getBoundingClientRect().width; aim(at[0] * S, at[1] * S); }
+    stg.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse') return;
+      touchOn(); if (drag) return;
+      drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t0: Date.now(), moved: false };
+      try { stg.setPointerCapture(e.pointerId); } catch (er) {}
+    });
+    stg.addEventListener('pointermove', e => {
+      if (e.pointerType === 'mouse') { byTouch = false; move(e); return; }
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
+      if (!drag.moved && Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 8) drag.moved = true;
+      if (!drag.moved) return;
+      const S = stage.getBoundingClientRect().width;
+      aim(clamp(at[0] * S + dx, 0, S), clamp(at[1] * S + dy, 0, S));
+    });
+    const lift = e => {
+      if (e.pointerType === 'mouse' || !drag || e.pointerId !== drag.id) return;
+      const d = drag; drag = null; lastTouch = Date.now();
+      if (e.type === 'pointerup' && !d.moved && Date.now() - d.t0 < 600) note();
+    };
+    stg.addEventListener('pointerup', lift);
+    stg.addEventListener('pointercancel', lift);
+    stg.addEventListener('click', e => { if (Date.now() - lastTouch < 700) return; move(e); note(); });
+    window.addEventListener('resize', reaim);
+    if (G.touch || (window.matchMedia && matchMedia('(hover:none) and (pointer:coarse)').matches)) touchOn();
     hintTimer = setInterval(() => { if (dead) return; if (Date.now() - lastFind > 16000 && inView().some(x => !found[x.id])) hintBtn.style.visibility = 'visible'; }, 1000);
     hintBtn.onclick = () => {
       const ob = inView().find(x => !found[x.id]); if (!ob) return;
@@ -102,7 +147,7 @@ games.inspect = function (id, o) {
       ring.style.left = ((ob.at[0] * R + VB) / (2 * VB) * S) + 'px'; ring.style.top = ((ob.at[1] * R + VB) / (2 * VB) * S) + 'px';
       stage.appendChild(ring); setTimeout(() => ring.remove(), 2600); lastFind = Date.now(); hintBtn.style.visibility = 'hidden';
     };
-    doneBtn.onclick = () => { dead = true; clearInterval(hintTimer); Sound.sfx('click'); closeGame(); resolve({ found }); };
+    doneBtn.onclick = () => { dead = true; clearInterval(hintTimer); window.removeEventListener('resize', reaim); Sound.sfx('click'); closeGame(); resolve({ found }); };
     render();
   });
 };
