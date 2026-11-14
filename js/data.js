@@ -32,13 +32,36 @@ G.people = {
 const W = G.watches = {};
 W.none = { name: '', cfg: { none: true } };
 
+/* WEAR — what time has done to each watch, as the story tells it. Every watch's `wear`
+   should say everything the loupe notes and the script say about its condition.
+   Counts are drawn as given: scratches (on the crystal), spots, cracks, moist, burn,
+   backScratches. Words carry what a count can't. The 2D illustrator (wearOf in js/watch.js)
+   draws crystal, crown, case, dings, lume.crumbled, freckles, tide and strap; the rest are
+   on record for the notes and for any drawing, flat or 3D, that wants to show them:
+     crystal     'cobweb' fine scuffing all over · 'grey' scratched dull
+     crown       'thumb' milling worn smooth along one edge · 'replaced' a later part
+                 (with two crowns, { 4: 'replaced' } names the one at four o'clock)
+     case        'polished' bevels and edges gone soft · 'polished-hard' every edge rounded
+                 like soap · 'brassing' plating worn through to brass at the edges ·
+                 'sharp' never polished, edges as made
+     dings       [{ on: 'bezel', at: 150 }] a knock, in degrees clockwise from twelve
+     lume        { burnt: 0–1, crumbled: 0–1 } old radium gone brown and breaking up
+     freckles    'edge' where the spots gather
+     tide        'lower' where the moisture line sits
+     fade        'even' a dial colour that has shifted all over, untouched
+     stamps      'deep' · 'shallow' how hard the caseback was struck or engraved
+     dedication  'half-worn' an engraving rubbed down by the wrist
+     strap       'soft-dark' leather gone soft and dark
+     oil         'dried' a movement that has sat unrun for decades
+     rust        'movement' said to be inside; nobody has looked */
+
 /* ---- the heirloom ---- */
 const HEIR = {
   mm: 36, metal: 'steel', lugs: 'thin', bezel: { type: 'thin' }, bph: 18000,
   dial: { color: '#f3f0e7', finish: 'matte', track: 'none', indices: 'baton', applied: 'steel', idxW: 0.04, idxIn: 0.76, idxOut: 0.93, ink: '#3a3a3a', sub: [{ pos: 6, r: 0.27, type: 'seconds', plain: true }] },
   hands: { style: 'leaf', color: 'blued', seconds: 'sub' },
   strap: { type: 'leather', color: '#5a3a26', grain: 5 },
-  wear: { scratches: 16, seed2: 8 },
+  wear: { scratches: 16, seed2: 8, crystal: 'cobweb', crown: 'thumb', strap: 'soft-dark' },
   back: { type: 'snap', lines: [] },
   inside: { stamps: [{ t: 'ACIER INOXYDABLE', y: -0.66, s: 6 }], marks: [] },
   mov: { type: 'manual', finish: 'rhodium', swan: true, chatons: true, blue: true, text: [{ t: 'N° 7', x: -0.46, y: 0.7, s: 8.5, f: 'serif', i: true }] }
@@ -51,6 +74,7 @@ G.heirloomCfg = function (s, o) {
   if (s && s.flags.serviced) c.inside.marks.push({ t: 'LC 26', x: 0.2, y: 0.36, rot: -3, s: 10, c: '#ffffff', o: 0.95 });
   const name = o.name != null ? o.name : (s && s.flags.signed ? s.brand : '');
   if (name) { const n = name.toUpperCase(); c.dial.text = [{ t: n, y: -0.37, s: Math.min(8.6, 96 / Math.max(6, n.length)), f: 'serif', w: 600, ls: n.length > 12 ? 0.9 : 1.8 }]; }
+  if (o.name != null) c.wear = {};   // a named dial is the new watch on the bench, not her old one: no wear yet
   if (o.blank) { c.noHands = true; c.strap = null; }
   return c;
 };
@@ -97,7 +121,7 @@ W.w_yvette = { name: 'a small gold watch', cfg: { mm: 24, metal: 'gold', lugs: '
 /* ---- the orphan Mai gives you to sell ---- */
 W.orphan = {
   name: 'Omega Seamaster, c.1964', sub: 'left for repair in 1998 · never collected',
-  cfg: { mm: 34.5, metal: 'steel', bezel: { type: 'thin' }, bph: 19800, dial: { color: '#d9dcdc', finish: 'sunburst', track: 'ticks', indices: 'baton', applied: 'steel', ink: '#222', date: { pos: 3 }, text: [{ t: 'OMEGA', y: -0.36, s: 8, w: 500, ls: 1.4 }, { t: 'Seamaster', y: 0.34, s: 8, f: 'script', ls: 0 }], arc: 'SWISS MADE' }, hands: { style: 'dauphine', color: 'steel', seconds: 'center' }, strap: { type: 'leather', color: '#2b221b' }, wear: { spots: 10, seed: 4, scratches: 6 },
+  cfg: { mm: 34.5, metal: 'steel', bezel: { type: 'thin' }, bph: 19800, dial: { color: '#d9dcdc', finish: 'sunburst', track: 'ticks', indices: 'baton', applied: 'steel', ink: '#222', date: { pos: 3 }, text: [{ t: 'OMEGA', y: -0.36, s: 8, w: 500, ls: 1.4 }, { t: 'Seamaster', y: 0.34, s: 8, f: 'script', ls: 0 }], arc: 'SWISS MADE' }, hands: { style: 'dauphine', color: 'steel', seconds: 'center' }, strap: { type: 'leather', color: '#2b221b' }, wear: { spots: 10, seed: 4, scratches: 6, freckles: 'edge', crown: 'replaced', case: 'polished' },
     back: { type: 'snap', arcTop: 'WATERPROOF', lines: [{ t: 'SEAMASTER', y: 0, s: 9 }], arcBottom: 'STAINLESS STEEL' }, mov: { type: 'auto', finish: 'rose', rotorText: 'TWENTY-FOUR JEWELS' } },
   views: ['dial', 'back', 'movement'],
   obs: [
@@ -117,7 +141,7 @@ const WWW = (brand, extra) => Watch.merge({
 }, extra || {});
 W.cymaA = {
   name: 'Cyma W.W.W.', sub: 'British Army issue · 1945 · La Chaux-de-Fonds',
-  cfg: WWW('CYMA', { wear: { scratches: 12, seed2: 3, backScratches: 14 }, back: { arcTop: 'STAINLESS STEEL', lines: [{ t: 'W.W.W.', y: -0.14, s: 13 }, { t: 'P 21384', y: 0.16, s: 10 }, { t: '70591', y: 0.42, s: 8.5 }], logo: 'broadarrow', logoY: -0.46 } }),
+  cfg: WWW('CYMA', { wear: { scratches: 12, seed2: 3, backScratches: 14, crystal: 'grey', lume: { burnt: 1, crumbled: 0.35 }, case: 'sharp', stamps: 'deep' }, back: { arcTop: 'STAINLESS STEEL', lines: [{ t: 'W.W.W.', y: -0.14, s: 13 }, { t: 'P 21384', y: 0.16, s: 10 }, { t: '70591', y: 0.42, s: 8.5 }], logo: 'broadarrow', logoY: -0.46 } }),
   views: ['dial', 'uv', 'back'], closed: { movement: '“I don’t open backs in the rain, love. Come back at ten and I’ll show you fifteen jewels and no rust.”' },
   verdict: 'An honest soldier: original dial, radium burnt brown, both numbers right. The sister of Papa’s watch.',
   obs: [
@@ -133,7 +157,7 @@ W.cymaA = {
 };
 W.recordB = {
   name: 'Record W.W.W.', sub: 'British Army issue · 1945 · re-dialled in service',
-  cfg: WWW('RECORD', { mm: 36.5, metal: 'chrome', dial: { ink: '#f4f2ea', lume: 'tritium', logo: 'circleT', logoY: -0.2, text: [{ t: 'RECORD', y: -0.4, s: 8, w: 500, ls: 1.2 }] }, hands: { lume: 'tritium' }, strap: { type: 'nato', color: '#6d7078' }, wear: { scratches: 5 }, back: { lines: [{ t: 'W.W.W.', y: -0.14, s: 13 }, { t: 'L 14027', y: 0.16, s: 10 }, { t: '628344', y: 0.42, s: 8.5 }], logo: 'broadarrow', logoY: -0.46 } }),
+  cfg: WWW('RECORD', { mm: 36.5, metal: 'chrome', dial: { ink: '#f4f2ea', lume: 'tritium', logo: 'circleT', logoY: -0.2, text: [{ t: 'RECORD', y: -0.4, s: 8, w: 500, ls: 1.2 }] }, hands: { lume: 'tritium' }, strap: { type: 'nato', color: '#6d7078' }, wear: { scratches: 5, case: 'brassing', stamps: 'deep' }, back: { lines: [{ t: 'W.W.W.', y: -0.14, s: 13 }, { t: 'L 14027', y: 0.16, s: 10 }, { t: '628344', y: 0.42, s: 8.5 }], logo: 'broadarrow', logoY: -0.46 } }),
   views: ['dial', 'uv', 'back'], closed: { movement: '“Not in this weather.”' },
   verdict: 'A real issue watch wearing a Ministry replacement dial. Not as it left the factory in 1945, but every change was made by the Army.',
   obs: [
@@ -146,7 +170,7 @@ W.recordB = {
 };
 W.omegaC = {
   name: '“Omega W.W.W.”', sub: 'described as: British Army issue · 1945',
-  cfg: WWW('OMEGA', { mm: 35, metal: 'polished', dial: { color: '#0c0c0c', ink: '#ffffff', lume: 'fresh', lumeColor: '#e8d48a', logoY: -0.17, text: [{ t: 'OMEGA', y: -0.39, s: 10, w: 600, ls: 0.6 }] }, hands: { style: 'sword', lume: 'fresh', color: 'steel' }, strap: { type: 'leather', color: '#3a2a1c' }, back: { lines: [{ t: 'W.W.W', y: -0.1, s: 15, f: 'serif' }, { t: 'Y 8351', y: 0.26, s: 9 }], logo: 'broadarrow', logoY: -0.46 } }),
+  cfg: WWW('OMEGA', { mm: 35, metal: 'polished', dial: { color: '#0c0c0c', ink: '#ffffff', lume: 'fresh', lumeColor: '#e8d48a', logoY: -0.17, text: [{ t: 'OMEGA', y: -0.39, s: 10, w: 600, ls: 0.6 }] }, hands: { style: 'sword', lume: 'fresh', color: 'steel' }, strap: { type: 'leather', color: '#3a2a1c' }, wear: { case: 'polished-hard', stamps: 'shallow' }, back: { lines: [{ t: 'W.W.W', y: -0.1, s: 15, f: 'serif' }, { t: 'Y 8351', y: 0.26, s: 9 }], logo: 'broadarrow', logoY: -0.46 } }),
   views: ['dial', 'uv', 'back'], closed: { movement: '“Can’t open it, mate, haven’t got the tool on me.”' },
   verdict: 'A put-together: a real old case, perhaps, wearing a new dial, new paint and somebody else’s hands. It fills the pocket. It is nobody’s sister.',
   obs: [
@@ -179,7 +203,7 @@ const CORE = extra => Watch.merge({
 }, extra || {});
 W.coremontA = {
   name: 'Corémont extra-plate', sub: '18-carat gold · 33 mm · c.1961',
-  cfg: CORE({ wear: { spots: 26, seed: 12, spotColor: '#8a6a3a', scratches: 4 }, back: { type: 'snap', lines: [{ t: 'à Thérèse', y: -0.22, s: 12, f: 'script', ls: 0, o: 0.5 }, { t: '1961', y: 0.02, s: 10, f: 'script', ls: 0, o: 0.5 }, { t: '0,750', y: 0.46, s: 6.5 }, { t: '⌂ 127', y: 0.6, s: 6 }] }, mov: { type: 'manual', finish: 'gilt', text: [{ t: 'CORÉMONT WATCH C°', x: -0.5, y: -0.72, s: 5.5, rot: -24 }, { t: '17 RUBIS', x: -0.42, y: 0.78, s: 5.5 }, { t: 'SWISS', x: -0.1, y: 0.92, s: 5 }] } }),
+  cfg: CORE({ wear: { spots: 26, seed: 12, spotColor: '#8a6a3a', scratches: 4, case: 'sharp', stamps: 'deep', dedication: 'half-worn' }, back: { type: 'snap', lines: [{ t: 'à Thérèse', y: -0.22, s: 12, f: 'script', ls: 0, o: 0.5 }, { t: '1961', y: 0.02, s: 10, f: 'script', ls: 0, o: 0.5 }, { t: '0,750', y: 0.46, s: 6.5 }, { t: '⌂ 127', y: 0.6, s: 6 }] }, mov: { type: 'manual', finish: 'gilt', text: [{ t: 'CORÉMONT WATCH C°', x: -0.5, y: -0.72, s: 5.5, rot: -24 }, { t: '17 RUBIS', x: -0.42, y: 0.78, s: 5.5 }, { t: 'SWISS', x: -0.1, y: 0.92, s: 5 }] } }),
   views: ['dial', 'back', 'movement'],
   verdict: 'Thin, gold, untouched, and somebody else’s wedding present. A sister of the watch Émile gave her.',
   obs: [
@@ -195,7 +219,7 @@ W.coremontA = {
 };
 W.coremontB = {
   name: 'Corémont, steel', sub: 'stainless · 34 mm · offered as “c.1958, mint”',
-  cfg: CORE({ mm: 34, metal: 'steel', dial: { color: '#fbfaf6', finish: 'matte', applied: 'steel', trackAt: 0.965, text: [{ t: 'COREMONT', y: -0.35, s: 8.6, f: 'serif', w: 700, ls: 1.1, sk: -7 }], logo: 'star', logoY: -0.52, arc: '' }, hands: { style: 'dauphine', color: 'steel' }, strap: { type: 'leather', color: '#3a2618' }, back: { arcTop: 'ANTIMAGNÉTIQUE · ÉTANCHE', lines: [{ t: 'CORÉMONT', y: 0, s: 9, f: 'serif' }], arcBottom: 'ACIER INOXYDABLE' } }),
+  cfg: CORE({ mm: 34, metal: 'steel', dial: { color: '#fbfaf6', finish: 'matte', applied: 'steel', trackAt: 0.965, text: [{ t: 'COREMONT', y: -0.35, s: 8.6, f: 'serif', w: 700, ls: 1.1, sk: -7 }], logo: 'star', logoY: -0.52, arc: '' }, hands: { style: 'dauphine', color: 'steel' }, strap: { type: 'leather', color: '#3a2618' }, wear: { backScratches: 16, seed3: 12, stamps: 'deep' }, back: { arcSize: 6.8, arcTop: 'ANTIMAGNÉTIQUE · ÉTANCHE', lines: [{ t: 'CORÉMONT', y: 0, s: 9, f: 'serif' }], arcBottom: 'ACIER INOXYDABLE' } }),
   views: ['dial', 'back'], closed: { movement: '“The back is tight. I don’t force backs,” says the man at the next stall, who is selling it.' },
   verdict: 'A real Corémont with a repainted face. The watch is true and the name on it is a copy of itself.',
   obs: [
@@ -217,7 +241,7 @@ W.enicarA = {
   cfg: { mm: 40, metal: 'steel', bezel: { type: 'thin', w: 0.045 }, crown: { pos: [2, 4], kind: 'cross' }, bph: 18000,
     dial: { color: '#101216', finish: 'matte', track: 'none', indices: 'baton', lume: 'pumpkin', idxIn: 0.6, idxOut: 0.8, idxW: 0.06, ink: '#e8e3d0', inner: { color: '#0b0c0f' }, date: { pos: 3, at: 0.6 }, text: [{ t: 'ENICAR', y: -0.33, s: 8, w: 500, ls: 1.4 }, { t: 'SHERPA', y: 0.3, s: 5.4, ls: 1.4 }, { t: 'Super-Dive', y: 0.41, s: 6.4, f: 'script', ls: 0 }], arc: '' },
     hands: { style: 'sword', color: 'steel', lume: 'pumpkin', seconds: 'center', secStyle: 'arrow' },
-    strap: { type: 'rubber', color: '#141414' }, wear: { moist: 0.3, scratches: 8 },
+    strap: { type: 'rubber', color: '#141414' }, wear: { moist: 0.3, scratches: 8, tide: 'lower', crown: { 4: 'replaced' } },
     back: { arcTop: 'SUPER COMPRESSOR', lines: [{ t: 'SHERPA', y: -0.05, s: 11 }, { t: '600', y: 0.2, s: 10 }], arcBottom: 'WATERPROOF · STAINLESS STEEL' },
     inside: { stamps: [{ t: 'E. PIQUEREZ S.A.', y: -0.02, s: 6.5 }, { t: 'BREVET ✚', y: 0.14, s: 6.5 }, { t: 'SWISS MADE', y: 0.6, s: 5.5 }], logo: 'helmet', logoY: -0.38, marks: [{ t: '4.71 R', x: -0.6, y: 0.4, rot: 20 }] },
     mov: { type: 'auto', finish: 'rhodium', rotorText: 'ENICAR · ULTRASONIC · 21 RUBIS' } },
@@ -238,7 +262,7 @@ W.skinB = {
   name: 'Skin diver, signed by a shop', sub: 'private label · c.1968',
   cfg: { mm: 36, metal: 'chrome', bezel: { type: 'dive', faded: 0.45, w: 0.17 }, bph: 18000,
     dial: { color: '#141414', finish: 'matte', track: 'ticks', indices: 'dot', lume: 'tritium', ink: '#e8e3d0', date: { pos: 3 }, text: [{ t: 'AUBAGNE FRÈRES', y: -0.38, s: 5.6, ls: 1 }, { t: 'TOULON', y: -0.27, s: 4.6, ls: 1.4 }, { t: '17 JEWELS', y: 0.3, s: 4.6, ls: 1 }, { t: 'INCABLOC', y: 0.4, s: 4.6, ls: 1 }, { t: 'WATERPROOF', y: 0.5, s: 4.6, ls: 1 }] },
-    hands: { style: 'pencil', color: 'steel', lume: 'tritium', seconds: 'center' }, strap: { type: 'rubber', color: '#1a1a1a' }, wear: { scratches: 14 } },
+    hands: { style: 'pencil', color: 'steel', lume: 'tritium', seconds: 'center' }, strap: { type: 'rubber', color: '#1a1a1a' }, wear: { scratches: 14, rust: 'movement' } },
   views: ['dial', 'uv'], closed: { movement: '“That one I don’t open. If I open it you’ll see the rust and I’ll have to give it to you.”' },
   verdict: 'A beach watch with a shop’s name on it. Honest, cheap, and not a Compressor. It holds the pocket open.',
   obs: [
@@ -254,7 +278,7 @@ W.chronoA = {
   name: 'Meridor chronograph', sub: 'Valjoux 7733 · hand-wound · c.1969',
   cfg: { mm: 37, metal: 'steel', bezel: { type: 'tachy' }, pushers: true, bph: 18000,
     dial: { color: '#ece8dd', finish: 'matte', track: 'fine', indices: 'baton', lume: 'pumpkin', idxW: 0.045, ink: '#151515', sub: [{ pos: 3, r: 0.25, type: '30min', color: '#151515', ink: '#eee' }, { pos: 9, r: 0.25, type: 'seconds', color: '#151515', ink: '#eee' }], text: [{ t: 'MERIDOR', y: -0.42, s: 6.8, ls: 1.4 }, { t: 'T SWISS T', y: 0.6, s: 3.6, ls: 1 }] },
-    hands: { style: 'baton', color: 'black', lume: 'pumpkin', seconds: 'sub', chrono: true, secColor: 'red' }, strap: { type: 'leather', color: '#2a2018' }, wear: { scratches: 7 },
+    hands: { style: 'baton', color: 'black', lume: 'pumpkin', seconds: 'sub', chrono: true, secColor: 'red' }, strap: { type: 'leather', color: '#2a2018' }, wear: { scratches: 7, dings: [{ on: 'bezel', at: 150 }] },
     back: { arcTop: 'STAINLESS STEEL · WATERPROOF', lines: [{ t: 'INCABLOC', y: 0, s: 8 }, { t: '7733 · 4129', y: 0.3, s: 7 }] },
     mov: { type: 'chrono', finish: 'gilt', cam: true, text: [{ t: 'SEVENTEEN JEWELS', x: -0.52, y: 0.8, s: 5 }, { t: 'SWISS', x: -0.1, y: 0.93, s: 5 }, { t: '7733', x: -0.66, y: -0.7, s: 6 }] } },
   views: ['dial', 'uv', 'back', 'movement'],
@@ -278,7 +302,7 @@ const POGUE = extra => Watch.merge({
 }, extra || {});
 W.pogueC = {
   name: 'Seiko 6139 “Pogue”', sub: 'automatic chronograph · November 1973',
-  cfg: POGUE({ wear: { scratches: 9 }, back: { arcTop: 'WATER RESISTANT · STAINLESS STEEL', lines: [{ t: 'SEIKO', y: -0.16, s: 12, w: 600 }, { t: '6139-6002', y: 0.1, s: 8 }, { t: '3N4087', y: 0.34, s: 8 }], arcBottom: 'JAPAN' }, mov: { type: 'chrono', rotor: true, finish: 'nickel', rotorText: 'SEIKO · 17 JEWELS · 6139B' } }),
+  cfg: POGUE({ wear: { scratches: 9, fade: 'even' }, back: { arcTop: 'WATER RESISTANT · STAINLESS STEEL', lines: [{ t: 'SEIKO', y: -0.16, s: 12, w: 600 }, { t: '6139-6002', y: 0.1, s: 8 }, { t: '3N4087', y: 0.34, s: 8 }], arcBottom: 'JAPAN' }, mov: { type: 'chrono', rotor: true, finish: 'nickel', rotorText: 'SEIKO · 17 JEWELS · 6139B' } }),
   views: ['dial', 'back', 'movement'],
   verdict: 'One of the three automatic chronographs of 1969, and the calibre that went to Skylab. Honest, a little faded, and a cousin rather than a sister.',
   obs: [
@@ -364,7 +388,7 @@ W.dialPrinted = { name: 'a printed dial', cfg: s => ({ mm: 40, metal: 'brass', l
 /* ---- the Jura ---- */
 W.cal13 = {
   name: 'Corémont calibre 13‴', sub: 'one of a gross · finished 1976 · never cased',
-  cfg: { mm: 36, metal: 'brass', lugs: 'none', strap: null, crown: { pos: 0 }, bph: 18000, mov: { type: 'manual', finish: 'rhodium', swan: true, chatons: true, blue: true, text: [{ t: 'N° 96', x: -0.46, y: 0.7, s: 8.5, f: 'serif', i: true }] } },
+  cfg: { mm: 36, metal: 'brass', lugs: 'none', strap: null, crown: { pos: 0 }, bph: 18000, wear: { oil: 'dried' }, mov: { type: 'manual', finish: 'rhodium', swan: true, chatons: true, blue: true, text: [{ t: 'N° 96', x: -0.46, y: 0.7, s: 8.5, f: 'serif', i: true }] } },
   views: ['movement'], stopped: true,
   obs: [
     { id: 'same', v: 'movement', at: [-0.3, -0.5], r: 0.3, t: 'The same stripes', x: 'The same bridges, the same blued screws, the same gold collars round the jewels as the one on your wrist. A [[ligne]] is an old French unit, a twelfth of an inch; thirteen lignes is about 29 millimetres. This is its twin.' },

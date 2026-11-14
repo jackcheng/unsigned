@@ -1,10 +1,11 @@
-const CACHE = 'unsigned-v4';
+const CACHE = 'unsigned-v6';
 const FILES = [
   './',
   './index.html',
   './manifest.webmanifest',
   './css/style.css',
   './js/audio.js',
+  './js/chapters.js',
   './js/data.js',
   './js/engine.js',
   './js/fonts.js',

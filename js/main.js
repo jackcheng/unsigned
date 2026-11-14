@@ -10,7 +10,7 @@ function begin(scene, resume) {
   ov.classList.add('out');
   setTimeout(() => {
     ov.className = ''; ov.innerHTML = ''; G.modal = false;
-    if (resume) G.restoreStage(); else { G.setBg(null, null, true); G.setHud('', ''); }
+    if (resume === 'staged') { /* the chapter list has set the stage already */ } else if (resume) G.restoreStage(); else { G.setBg(null, null, true); G.setHud('', ''); }
     G.run(scene).catch(e => { console.error(e); });
   }, 800);
 }
@@ -23,12 +23,20 @@ function title() {
   ov.innerHTML = `<div class="start"><div class="start-watch">${Watch.svg(G.heirloomCfg(ok ? saved : null), { live: true, vb: '-150 -200 300 400' })}</div>
     <div class="start-text"><h1>UNSIGNED</h1><p class="tag">A game about watches, and the people nobody put on the dial.</p><div class="act">Act I · The Empty Roll</div>
     <div class="start-btns">${ok ? '<button class="btn gold" data-a="cont">Continue</button>' : ''}<button class="btn${ok ? '' : ' gold'}" data-a="new">${ok ? 'Begin again' : 'Begin'}</button></div>
-    <p class="start-fine">About ninety minutes. It saves by itself. Best with sound.<br>Click, or press <b>Space</b>, to go on. Underlined words can be clicked.</p><button class="linkbtn" data-a="code">Have a save code?</button></div></div>`;
+    <p class="start-fine">About ninety minutes. It saves by itself. Best with sound.<br>Click, or press <b>Space</b>, to go on. Underlined words can be clicked.</p><div class="start-links"><button class="linkbtn" data-a="code">Have a save code?</button>${G.chapters.on() ? '<button class="linkbtn" data-a="chap">Chapters</button>' : ''}</div></div></div>`;
+  /* five quick taps on the act line show or hide the chapter list (a playtesting tool, kept out of players' sight) */
+  let taps = 0, tapT = null;
+  $('.act', ov).onclick = () => { clearTimeout(tapT); tapT = setTimeout(() => { taps = 0; }, 1500); if (++taps >= 5) { G.chapters.set(!G.chapters.on()); title(); } };
   $$('[data-a]', ov).forEach(b => b.onclick = () => {
     if (b.dataset.a === 'code') return paste();
+    if (b.dataset.a === 'chap') return chapters();
     if (b.dataset.a === 'cont') { G.s = saved; if (!G.s.news) G.s.news = { nodes: {}, terms: {}, pages: {}, roll: {} }; begin(saved.scene, true); }
     else { if (ok && !confirm('Start again from the beginning? Your saved game will be replaced.')) return; G.wipe(); G.s = G.fresh(); begin(FIRST, false); }
   });
+}
+
+function chapters() {
+  G.chapters.open($('#overlay'), title, (scene, snap) => { G.s = snap; G.restoreStage(); begin(scene, 'staged'); });
 }
 
 function paste() {
@@ -63,6 +71,7 @@ function dev(scene) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const q = new URLSearchParams(location.search), sc = q.get('scene');
-  if (sc && G.scenes[sc]) dev(sc); else title();
+  if (q.has('chapters')) G.chapters.set(q.get('chapters') !== '0');
+  if (sc && G.scenes[sc]) dev(sc); else { title(); if (G.chapters.on() && G.chapters.asked()) chapters(); }
 });
 })();

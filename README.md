@@ -22,6 +22,12 @@ About ninety minutes. It saves by itself at the start of every scene (in the bro
 - Underlined words can be clicked for a definition; they collect in the carnet.
 - The menu has switches for sound and for scene motion (falling snow, rain, water). Motion also backs off by itself on a machine that struggles.
 
+## Playtesting: the chapter list
+
+A **Chapters** link on the title screen (and a **Chapters** button in the menu) lists every scene under its chapter. Pick one and the game starts there. The story before it is played through silently, with every question asked and the first answer given each time, so the roll, the carnet, the money and the words learned are what that playthrough leaves. Nothing is stored per scene: the list is read off the script, so a new scene appears in it by itself (`js/chapters.js` holds the names shown).
+
+The link shows when the game is opened from a file or from this computer. On the published game it is hidden from players: tap the line "Act I · The Empty Roll" on the title screen five times quickly to show it (five more to hide it), or add `?chapters=1` to the address (`?chapters=0` hides it). The browser remembers the choice.
+
 ## What you do
 
 - **The loupe.** Examine each watch: dial, in the dark, caseback, movement. What you notice becomes your leverage.

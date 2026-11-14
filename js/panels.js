@@ -173,6 +173,7 @@ function menu(root, arg, close) {
       <label class="vol"><span>Volume</span><input type="range" min="0" max="100" step="5" value="${Math.round(Sound.vol * 100)}" aria-label="Volume"></label>
       <button class="btn" data-a="motion">Scene motion: ${G.motion.rate > 0 ? 'on' : 'off'}</button>
       <button class="btn" data-a="code">Save code</button>
+      ${G.chapters.on() ? '<button class="btn" data-a="chap">Chapters</button>' : ''}
       <button class="btn" data-a="title">Back to the title</button>
       <p class="mnote">The game saves by itself at the start of every scene.</p>`;
     const vr = $('.vol input', wrap);
@@ -185,6 +186,7 @@ function menu(root, arg, close) {
       else if (a === 'motion') { G.setMotion(G.motion.rate > 0 ? 0 : 20, true); main(); }
       else if (a === 'log') log();
       else if (a === 'code') code();
+      else if (a === 'chap') { G.chapters.ask(); location.reload(); }
       else if (a === 'title') { location.reload(); }
     });
   }

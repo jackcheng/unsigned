@@ -625,6 +625,37 @@ svg.links path.ghost{stroke-dasharray:3 5;opacity:.22}
 @supports (-webkit-touch-callout:none){.menuwrap .codebox{font-size:16px}}
 .menuwrap .codenote{padding:0 1rem}
 
+/* the chapter list (playtesting) */
+.start-links{display:flex;gap:1.6rem;flex-wrap:wrap}
+.start-text .act{-webkit-user-select:none;user-select:none}
+#overlay.g-chap{align-items:flex-start}
+.chap{width:min(84rem,calc(100vw - var(--sal) - var(--sar) - 2.4rem));padding:1.6rem 0 2rem}
+.chap-head{display:flex;justify-content:space-between;align-items:flex-start;gap:2rem}
+.chap-head h2{font:500 2.2rem var(--display);margin:0 0 .3rem;letter-spacing:.02em}
+.chap-head .btn{flex:none}
+.chap-note{font:italic 1.02rem var(--serif);color:#d9d0bc;line-height:1.45;max-width:46rem;margin:0}
+.chap-err{font:italic 1rem var(--serif);color:#e58a72;margin:.6rem 0 0;min-height:.6rem}
+.chap-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.6rem 1.4rem;margin-top:.8rem}
+.chap-grid section{border-top:1px solid var(--line);padding-top:.8rem;display:flex;flex-direction:column}
+.chap-n{font:500 .7rem var(--sans);letter-spacing:.3em;text-transform:uppercase;color:var(--brass)}
+.chap-grid h3{font:500 1.5rem var(--display);margin:.15rem 0 0;line-height:1.15}
+.chap-c{font:italic .95rem var(--serif);color:var(--mut);margin-bottom:.5rem;min-height:1.2rem}
+.chap-s{display:flex;flex-direction:column;align-items:flex-start;text-align:left;width:100%;min-height:2.5rem;justify-content:center;padding:.35rem .7rem;margin:.12rem 0;border:1px solid transparent;border-radius:.35rem;background:rgba(0,0,0,.18);font:400 1.05rem var(--serif);color:var(--cream);transition:background .15s,border-color .15s}
+.chap-s small{font:500 .68rem var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-top:.1rem}
+.chap-s.here{border-color:var(--line)}
+.chap-s.here small{color:var(--brass2)}
+.chap-s.going{background:var(--brass);color:#1a1408;border-color:var(--brass)}
+.chap-s.going small{color:#3a2c10}
+.chap-s:disabled:not(.going){opacity:.45}
+@media (hover:hover){.chap-s:hover:not(:disabled){border-color:var(--brass);background:rgba(201,163,90,.14)}}
+@media (max-width:600px),(orientation:landscape) and (max-height:500px){
+  .chap{padding:.8rem 0 1.2rem}
+  .chap-head h2{font-size:1.7rem}
+  .chap-grid{gap:1rem .9rem}
+  .chap-s{min-height:38px}
+  .chap-s small,.chap-n{font-size:max(11px,.68rem)}
+}
+
 /* ---------- landscape only ---------- */
 /* iPhone ignores an orientation lock from a web app, so an upright screen is asked to turn */
 #turn{display:none}

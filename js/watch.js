@@ -23,6 +23,34 @@ function merge(a, b) {
 }
 W.merge = merge;
 
+/* Wear. js/data.js describes each watch's wear in the story's words (see WEAR there). wearOf turns
+   those words into the amounts the drawing functions below use, so a loupe note never describes
+   wear the picture does not show. A number may be given in place of a word for a finer amount.
+     crystal 'cobweb' | 'grey'      -> haze: scuffed all over, fine as cobweb; greys a dark dial
+     crown 'thumb'                  -> crown: knurling worn smooth along one edge
+     crown { 4: 'replaced' }        -> that crown is a later part, sharper and brighter than the other
+     case 'polished' | 'polished-hard' -> polished: lugs lose bevels and corners, the bezel its edge
+     case 'brassing'                -> brass: plating worn through to brass at the edges
+     dings [{ on: 'bezel', at }]    -> dent: a flat knocked into the bezel at that clock angle
+     lume { crumbled }              -> crumble: lume dots chipped at their edges
+     freckles 'edge'                -> spotsIn: the dial's spots keep to the edge
+     tide 'lower'                   -> the moisture bloom sits along the lower edge only, with a tide-line
+     strap 'soft-dark'              -> strap: leather gone soft and dark
+   Counts (scratches, spots, cracks, burn, moist, backScratches) and their seeds are drawn as given. */
+function wearOf(c) {
+  const w = c.wear || {}, o = Object.assign({}, w), num = v => typeof v === 'number';
+  o.haze = num(w.haze) ? w.haze : w.crystal === 'cobweb' ? 0.5 : w.crystal === 'grey' ? 0.7 : 0;
+  o.crown = num(w.crown) ? w.crown : w.crown === 'thumb' ? 0.9 : 0;
+  o.replaced = w.crown && typeof w.crown === 'object' ? Object.keys(w.crown).filter(k => w.crown[k] === 'replaced').map(Number)[0] : null;
+  o.polished = num(w.polished) ? w.polished : w.case === 'polished-hard' ? 1 : w.case === 'polished' ? 0.6 : 0;
+  o.brass = num(w.brass) ? w.brass : w.case === 'brassing' ? 0.7 : 0;
+  o.dent = w.dent || (w.dings || []).filter(d => d.on === 'bezel')[0] || null;
+  o.crumble = num(w.crumble) ? w.crumble : w.lume && w.lume.crumbled ? Math.min(1, w.lume.crumbled * 1.7) : 0;
+  o.spotsIn = num(w.spotsIn) ? w.spotsIn : w.freckles === 'edge' ? 0.72 : 0.15;
+  if (w.tide === 'lower' && w.moistAt == null) { o.moistAt = 205; o.moistSpan = 120; o.moistR = c.dial && c.dial.inner ? 0.8 : 0.95; }
+  o.strap = num(w.strap) ? w.strap : w.strap === 'soft-dark' ? 0.8 : 0;
+  return o;
+}
 const FONT = {
   sans: "Jost,'Futura','Avenir Next','Helvetica Neue',Arial,sans-serif",
   serif: "'Cormorant Garamond','EB Garamond',Georgia,serif",
@@ -205,6 +233,14 @@ function strap(c, g, id, o) {
     } else { // leather
       const sc = st.stitch || 'rgba(255,255,255,0.35)';
       one += `<line x1="${r2(-sw + 4.5)}" y1="${r2(y0)}" x2="${r2(-sw * tp + 4.5)}" y2="${y1}" stroke="${sc}" stroke-width="1" stroke-dasharray="4 3.2"/><line x1="${r2(sw - 4.5)}" y1="${r2(y0)}" x2="${r2(sw * tp - 4.5)}" y2="${y1}" stroke="${sc}" stroke-width="1" stroke-dasharray="4 3.2"/>`;
+      const age = (c.wear && c.wear.strap) || 0;
+      if (age) { // gone soft and dark: handled edges, creases where it bends round the wrist
+        const rnd = rng(17);
+        one += `<path d="${shape}" fill="#140c06" opacity="${r2(0.3 * age)}"/>`;
+        one += `<path d="M${r2(-sw)},${r2(y0)}L${r2(-sw * tp)},${y1}M${r2(sw)},${r2(y0)}L${r2(sw * tp)},${y1}" stroke="#0a0604" stroke-width="${r2(sw * 0.5)}" opacity="${r2(0.42 * age)}" fill="none" filter="url(#${id}bz)"/>`;
+        for (let i = 0, y = R * 1.22; i < 8; i++) { y += 5 + rnd() * 13; const xc = (rnd() * 2 - 1) * sw * 0.5, hl = sw * (0.22 + rnd() * 0.4), k = rnd() * 5 - 2.5, t = rnd() * 4 - 2;
+          one += `<path d="M${r2(xc - hl)},${r2(y - t)}Q${r2(xc)},${r2(y + k)} ${r2(xc + hl)},${r2(y + t)}" stroke="#000" stroke-width="${r2(0.45 + rnd() * 0.5)}" stroke-linecap="round" opacity="${r2((0.16 + rnd() * 0.18) * age)}" fill="none"/>`; }
+      }
       if (st.grain) { const rnd = rng(st.grain); for (let i = 0; i < 70; i++) { const x = (rnd() * 2 - 1) * sw, y = y0 + rnd() * 200; one += `<path d="M${r2(x)},${r2(y)}q${r2(rnd() * 6 - 3)},${r2(rnd() * 4)} ${r2(rnd() * 8 - 4)},${r2(rnd() * 8)}" stroke="#000" stroke-width="0.5" opacity="0.22" fill="none"/>`; } }
     }
     one += `<path d="${shape}" fill="url(#${id}sg)"/>`;
@@ -216,9 +252,9 @@ function strap(c, g, id, o) {
 
 /* ---------- lugs, crown, case ---------- */
 function lugs(c, g, id, M) {
-  const R = g.R, sw = g.sw, type = c.lugs;
+  const R = g.R, sw = g.sw, type = c.lugs, wr = c.wear || {};
   if (type === 'none' || c.shape === 'tonneau' || c.shape === 'octagon' || c.shape === 'tv') return '';
-  let one = '';
+  let one = '', brass = null, clip = '';
   if (c.shape === 'rect') { // brancards
     const x0 = g.cw - R * 0.2, x1 = g.cw, y = g.ch + R * 0.2;
     one = `<path d="M${r2(x0)},${r2(-y)}Q${r2((x0 + x1) / 2)},${r2(-y - 5)} ${r2(x1)},${r2(-y)}L${r2(x1)},${r2(-g.ch + 10)}L${r2(x0)},${r2(-g.ch + 10)}Z" fill="url(#${id}m)" stroke="${M[4]}" stroke-width="0.8" stroke-linejoin="round"/>`;
@@ -230,11 +266,18 @@ function lugs(c, g, id, M) {
     const thin = type === 'thin', ltT = R * (thin ? 0.09 : type === 'bold' ? 0.17 : 0.135), ltB = R * (thin ? 0.19 : type === 'bold' ? 0.32 : 0.27), yE = R + R * (c.lugLen || (thin ? 0.23 : 0.25));
     const base = c.shape === 'cushion' || c.shape === 'square' ? R * 0.99 : R;
     const xb = Math.min(sw + ltB, base * 0.97), yb = -Math.sqrt(Math.max(0, base * base - xb * xb)) + 2, xt = sw + ltT;
-    one = `<path d="M${r2(sw)},${r2(-R * 0.55)}L${r2(sw)},${r2(-yE + 3)}Q${r2(sw)},${r2(-yE)} ${r2(sw + 3)},${r2(-yE)}L${r2(xt - 3)},${r2(-yE)}Q${r2(xt)},${r2(-yE)} ${r2(xt + 0.5)},${r2(-yE + 4)}Q${r2(xt + R * 0.035)},${r2(yb - R * 0.17)} ${r2(xb)},${r2(yb)}L${r2(xb)},${r2(-R * 0.5)}Z" fill="url(#${id}m)" stroke="${M[4]}" stroke-width="0.8" stroke-linejoin="round"/>`;
-    one += `<path d="M${r2(sw + 2)},${r2(-R * 0.92)}L${r2(sw + 2)},${r2(-yE + 3)}" stroke="${M[0]}" stroke-width="1" opacity="0.7"/>`;
+    // polished: the tip rounds off like soap and the bevel line along the inner edge goes
+    const pol = Math.min(1, wr.polished || 0), cr = 3 + Math.max(0, ltT / 2 - 3) * pol, cy = 4 + ltT * 0.5 * pol;
+    one = `<path d="M${r2(sw)},${r2(-R * 0.55)}L${r2(sw)},${r2(-yE + cr)}Q${r2(sw)},${r2(-yE)} ${r2(sw + cr)},${r2(-yE)}L${r2(xt - cr)},${r2(-yE)}Q${r2(xt)},${r2(-yE)} ${r2(xt + 0.5)},${r2(-yE + cy)}Q${r2(xt + R * 0.035)},${r2(yb - R * 0.17)} ${r2(xb)},${r2(yb)}L${r2(xb)},${r2(-R * 0.5)}Z" fill="url(#${id}m)" stroke="${M[4]}" stroke-width="${r2(0.8 - 0.3 * pol)}" stroke-linejoin="round"/>`;
+    if (pol < 1) one += `<path d="M${r2(sw + 2)},${r2(-R * 0.92)}L${r2(sw + 2)},${r2(-yE + 3)}" stroke="${M[0]}" stroke-width="1" opacity="${r2(0.7 * (1 - pol))}"/>`;
+    if (pol) one += `<path d="M${r2(sw + ltT * 0.5)},${r2(-R * 0.98)}L${r2(sw + ltT * 0.5)},${r2(-yE + cy + 1)}" stroke="#fff" stroke-width="${r2(ltT * 0.45)}" stroke-linecap="round" opacity="${r2(0.3 * pol)}"/>`;
+    // plating worn through: brass along the tip and the outer flank, where a sleeve rubs
+    if (wr.brass) { const ld = `M${r2(sw)},${r2(-R * 0.55)}L${r2(sw)},${r2(-yE + cr)}Q${r2(sw)},${r2(-yE)} ${r2(sw + cr)},${r2(-yE)}L${r2(xt - cr)},${r2(-yE)}Q${r2(xt)},${r2(-yE)} ${r2(xt + 0.5)},${r2(-yE + cy)}Q${r2(xt + R * 0.035)},${r2(yb - R * 0.17)} ${r2(xb)},${r2(yb)}`, li = yE - R * 0.55;
+      clip = `<clipPath id="${id}lg"><path d="${ld}L${r2(xb)},${r2(-R * 0.5)}Z"/></clipPath>`;
+      brass = (k) => `<path d="${ld}" clip-path="url(#${id}lg)" fill="none" stroke="#b8923f" stroke-width="${r2(2.4 + k * 2.2)}" stroke-dasharray="0 ${r2(li - 6 - k * 14)} ${r2(16 + ltT + k * 26)} 400" opacity="${r2(Math.min(1, (0.6 + k * 0.4) * wr.brass * 1.3))}"/>`; }
   }
-  let s = '<g class="w-lugs">';
-  [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(m => { s += `<g transform="scale(${m[0]},${m[1]})">${one}</g>`; });
+  let s = '<g class="w-lugs">' + clip;
+  [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach((m, i) => { s += `<g transform="scale(${m[0]},${m[1]})">${one}${brass ? brass([0.9, 0.35, 0.15, 0.7][i]) : ''}</g>`; });
   // spring bars
   if (c.shape !== 'rect' && type !== 'wire' && !c.strap) s += `<rect x="${r2(-sw)}" y="${r2(-R - R * 0.2)}" width="${r2(sw * 2)}" height="3" fill="${M[3]}"/><rect x="${r2(-sw)}" y="${r2(R + R * 0.2 - 3)}" width="${r2(sw * 2)}" height="3" fill="${M[3]}"/>`;
   return s + '</g>';
@@ -250,8 +293,12 @@ function crowns(c, g, id, M) {
     if (c.shape === 'cushion') return se(R * 0.99, R * 0.99, 3.6);
     return R;
   };
-  const one = (pos, size, kind) => {
+  const wr = c.wear || {};
+  const one = (pos, size, kind, main) => {
     const a = crownAt(pos), e = edge(a) - 2.5, sz = size || 1;
+    // a replaced crown is sharper and brighter than its neighbour; a worn one has lost its knurling on one edge
+    const fresh = cr.replaced != null && kind !== 'pusher' ? (cr.replaced === pos ? 1 : -1) : 0, ko = fresh > 0 ? 1 : fresh < 0 ? 0.5 : 0.75;
+    const worn = main && kind !== 'pusher' ? Math.min(1, wr.crown || 0) : 0;
     const len = (kind === 'onion' ? 15 : kind === 'pusher' ? 9 : 10.5) * sz, h = (kind === 'onion' ? 19 : kind === 'pusher' ? 9.5 : 17) * sz;
     let d = '';
     if (kind === 'pusher') {
@@ -263,17 +310,23 @@ function crowns(c, g, id, M) {
       for (let i = -3; i <= 3; i++) d += `<path d="M${r2(i * h / 8)},${r2(-e - 4)}Q${r2(i * h / 5.6)},${r2(-e - 4 - len / 2)} ${r2(i * h / 8)},${r2(-e - 4 - len)}" stroke="${M[4]}" stroke-width="0.6" fill="none" opacity="0.7"/>`;
     } else {
       d += `<rect x="-4" y="${r2(-e - 3)}" width="8" height="5" fill="${M[3]}"/>`;
-      d += `<rect x="${r2(-h / 2)}" y="${r2(-e - len - 1)}" width="${r2(h)}" height="${r2(len)}" rx="2.2" fill="url(#${id}h)" stroke="${M[4]}" stroke-width="0.7"/>`;
+      const wc = 2.2 + 3.6 * worn, yt = -e - len - 1, yb = -e - 1; // the worn corner is rounder than the other three
+      if (worn) d += `<path d="M${r2(-h / 2 + wc)},${r2(yt)}H${r2(h / 2 - 2.2)}Q${r2(h / 2)},${r2(yt)} ${r2(h / 2)},${r2(yt + 2.2)}V${r2(yb - 2.2)}Q${r2(h / 2)},${r2(yb)} ${r2(h / 2 - 2.2)},${r2(yb)}H${r2(-h / 2 + 2.2)}Q${r2(-h / 2)},${r2(yb)} ${r2(-h / 2)},${r2(yb - 2.2)}V${r2(yt + wc)}Q${r2(-h / 2)},${r2(yt)} ${r2(-h / 2 + wc)},${r2(yt)}Z" fill="url(#${id}h)" stroke="${M[4]}" stroke-width="0.7"/>`;
+      else d += `<rect x="${r2(-h / 2)}" y="${r2(-e - len - 1)}" width="${r2(h)}" height="${r2(len)}" rx="2.2" fill="url(#${id}h)" stroke="${M[4]}" stroke-width="0.7"/>`;
+      if (fresh > 0) d += `<rect x="${r2(-h / 2)}" y="${r2(-e - len - 1)}" width="${r2(h)}" height="${r2(len)}" rx="2.2" fill="#fff" opacity="0.3"/>`;
+      if (fresh < 0) d += `<rect x="${r2(-h / 2)}" y="${r2(-e - len - 1)}" width="${r2(h)}" height="${r2(len)}" rx="2.2" fill="#000" opacity="0.12"/>`;
       const n = Math.round(h / 2.1);
-      for (let i = 1; i < n; i++) d += `<line x1="${r2(-h / 2 + i * h / n)}" x2="${r2(-h / 2 + i * h / n)}" y1="${r2(-e - len - 0.2)}" y2="${r2(-e - 1.8)}" stroke="${M[4]}" stroke-width="0.55" opacity="0.75"/>`;
-      if (kind === 'cross') d += `<path d="M${r2(-h / 2 + 1)},${r2(-e - len)}L${r2(h / 2 - 1)},${r2(-e - 2)}M${r2(h / 2 - 1)},${r2(-e - len)}L${r2(-h / 2 + 1)},${r2(-e - 2)}" stroke="${M[4]}" stroke-width="0.7" opacity="0.8"/>`;
+      for (let i = 1; i < n; i++) { const x = -h / 2 + i * h / n, k = worn ? Math.max(0, 1 - worn * Math.max(0, -x / (h / 2)) * 2.4) : 1;
+        if (k > 0.02) d += `<line x1="${r2(x)}" x2="${r2(x)}" y1="${r2(-e - len - 0.2)}" y2="${r2(-e - 1.8)}" stroke="${M[4]}" stroke-width="${fresh > 0 ? 0.7 : 0.55}" opacity="${r2(ko * k)}"/>`; }
+      if (worn) d += `<path d="M${r2(-h / 2 + 0.6)},${r2(-e - 1.8)}L${r2(-h / 2 + 0.6)},${r2(-e - len + wc)}Q${r2(-h / 2 + 0.6)},${r2(-e - len - 0.4)} ${r2(-h / 2 + wc)},${r2(-e - len - 0.4)}L${r2(-h * 0.1)},${r2(-e - len - 0.4)}L${r2(-h * 0.22)},${r2(-e - 1.8)}Z" fill="${M[0]}" opacity="${r2(0.55 * worn)}"/>`;
+      if (kind === 'cross') d += `<path d="M${r2(-h / 2 + 1)},${r2(-e - len)}L${r2(h / 2 - 1)},${r2(-e - 2)}M${r2(h / 2 - 1)},${r2(-e - len)}L${r2(-h / 2 + 1)},${r2(-e - 2)}" stroke="${M[4]}" stroke-width="${fresh > 0 ? 0.9 : 0.7}" opacity="${r2(fresh > 0 ? 1 : fresh < 0 ? 0.55 : 0.8)}"/>`;
     }
     if (c.crown && c.crown.bow && pos === 12) d += `<ellipse cx="0" cy="${r2(-e - len - 13)}" rx="13" ry="11" fill="none" stroke="${M[2]}" stroke-width="4"/><ellipse cx="0" cy="${r2(-e - len - 13)}" rx="13" ry="11" fill="none" stroke="${M[0]}" stroke-width="1.2"/>`;
     return `<g class="w-crown" transform="rotate(${a})">${d}</g>`;
   };
   if (cr.guards) { const a = crownAt(cr.pos || 3); s += `<g transform="rotate(${a})"><path d="M-17,${r2(-R + 6)}L-13,${r2(-R - 9)}Q-11,${r2(-R - 11)} -9,${r2(-R - 8)}L-8,${r2(-R + 4)}ZM17,${r2(-R + 6)}L13,${r2(-R - 9)}Q11,${r2(-R - 11)} 9,${r2(-R - 8)}L8,${r2(-R + 4)}Z" fill="url(#${id}m)" stroke="${M[4]}" stroke-width="0.7"/></g>`; }
   const ps = Array.isArray(cr.pos) ? cr.pos : [cr.pos == null ? 3 : cr.pos];
-  if (cr.pos !== 0) ps.forEach(p => { s += one(p, cr.size, cr.kind); });
+  if (cr.pos !== 0) ps.forEach((p, i) => { s += one(p, cr.size, cr.kind, i === 0); });
   if (c.pushers) { const side = c.pushers === 'left' ? [300, 240] : null; (c.pushers === 'left' ? [10, 8] : c.pushers === 'mono' ? [2] : [2, 4]).forEach(p => { s += one(p, 1, 'pusher'); }); }
   return s + '</g>';
 }
@@ -305,7 +358,7 @@ function bezel(c, g, id, M) {
     s += `<path d="${rrect(g.hw + 2.5, g.hh + 2.5, R * (c.shape === 'square' ? 0.11 : 0.05))}" fill="#0c0c0c" opacity="0.75"/>`;
     return s + '</g>';
   }
-  const Rb = g.Rb, Rbi = g.Rbi;
+  const Rb = g.Rb, Rbi = g.Rbi, wr = c.wear || {};
   let s = '<g class="w-bezel">';
   const ins = b.color || '#101114', ink = b.ink || '#e9e6dc';
   if (t === 'octa') {
@@ -368,8 +421,23 @@ function bezel(c, g, id, M) {
   } else if (t === 'stepped') {
     s += `<circle r="${r2(Rb)}" fill="url(#${id}b)" stroke="${M[4]}" stroke-width="0.8"/><circle r="${r2((Rb + Rbi) / 2)}" fill="url(#${id}m)" stroke="${M[4]}" stroke-width="0.6"/>`;
   } else if (t !== 'none') {
-    s += `<circle r="${r2(Rb)}" fill="url(#${id}b)" stroke="${M[4]}" stroke-width="0.8"/>`;
-    s += `<circle r="${r2(Rb - 1.5)}" fill="none" stroke="${M[0]}" stroke-width="1" opacity="0.6"/>`;
+    const pol = Math.min(1, wr.polished || 0);
+    s += `<circle r="${r2(Rb)}" fill="url(#${id}b)" stroke="${M[4]}" stroke-width="${r2(0.8 - 0.3 * pol)}"/>`;
+    s += `<circle r="${r2(Rb - 1.5)}" fill="none" stroke="${M[0]}" stroke-width="1" opacity="${r2(0.6 * (1 - pol))}"/>`;
+    if (pol) { const rm = (Rb + Rbi) / 2, wd = (Rb - Rbi) * 0.55; // the crisp edge gone, a soft glare in its place
+      s += `<path d="M${pt(P(rm, -74))}A${r2(rm)},${r2(rm)} 0 0 1 ${pt(P(rm, -12))}" fill="none" stroke="#fff" stroke-width="${r2(wd)}" stroke-linecap="round" opacity="${r2(0.34 * pol)}"/><path d="M${pt(P(rm, 112))}A${r2(rm)},${r2(rm)} 0 0 1 ${pt(P(rm, 158))}" fill="none" stroke="#fff" stroke-width="${r2(wd * 0.8)}" stroke-linecap="round" opacity="${r2(0.22 * pol)}"/>`; }
+  }
+  if (wr.brass) { // plating worn through along the outer edges of bezel and case
+    const rnd = rng(wr.seed4 || 43); let q = '';
+    for (let i = 0; i < 9; i++) { const a = [70, 96, 118, 248, 268, 292, 20, 200, 322][i] + rnd() * 10 - 5, l = 7 + rnd() * 16, r = i < 6 ? R - 0.9 : Rb - 0.9;
+      q += `<path d="M${pt(P(r, a - l / 2))}A${r2(r)},${r2(r)} 0 0 1 ${pt(P(r, a + l / 2))}" stroke-width="${r2(1.2 + rnd() * 1.1)}" opacity="${r2(Math.min(1, (0.5 + rnd() * 0.5) * wr.brass * 1.4))}"/>`; }
+    s += `<g fill="none" stroke="#b8923f" stroke-linecap="round">${q}</g>`;
+  }
+  if (wr.dent) { // a flat knocked into the bezel
+    const a = wr.dent.at != null ? wr.dent.at : 150, h = (wr.dent.span || 16) / 2, ro = Rb + 0.7, p1 = P(ro, a - h), p2 = P(ro, a + h), q1 = P(Rb - 0.3, a - h * 0.94), q2 = P(Rb - 0.3, a + h * 0.94), n = P(1, a);
+    s += `<path d="M${pt(p1)}A${r2(ro)},${r2(ro)} 0 0 1 ${pt(p2)}Z" fill="${M[3]}"/>`;
+    s += `<line x1="${r2(q1[0] - n[0] * 1.5)}" y1="${r2(q1[1] - n[1] * 1.5)}" x2="${r2(q2[0] - n[0] * 1.5)}" y2="${r2(q2[1] - n[1] * 1.5)}" stroke="${M[4]}" stroke-width="2.2" stroke-linecap="round" opacity="0.4"/>`;
+    s += `<line x1="${r2(q1[0])}" y1="${r2(q1[1])}" x2="${r2(q2[0])}" y2="${r2(q2[1])}" stroke="${M[0]}" stroke-width="1.1" stroke-linecap="round"/>`;
   }
   // rehaut
   s += `<circle r="${r2(g.Rd + 2.6)}" fill="#0b0b0c" opacity="0.8"/>`;
@@ -450,11 +518,16 @@ function dial(c, g, id, M, out) {
     } else if (lc && !opts.nolume) lumeEl(`<rect class="" x="${r2(-w / 2)}" y="${r2(-len / 2)}" width="${r2(w)}" height="${r2(len)}" ${tf} fill="#L#"/>`);
     else s += `<rect x="${r2(-w / 2)}" y="${r2(-len / 2)}" width="${r2(w)}" height="${r2(len)}" ${tf} fill="${ink}"/>`;
   };
-  const dotIdx = (a, t, r) => { const p = E(a, t); if (AM) s += `<circle cx="${r2(p[0])}" cy="${r2(p[1])}" r="${r2(r + 1.2)}" fill="${AM[1]}" stroke="${AM[4]}" stroke-width="0.4"/>`; if (lc) lumeEl(`<circle class="" cx="${r2(p[0])}" cy="${r2(p[1])}" r="${r2(r)}" fill="#L#"/>`); else s += `<circle cx="${r2(p[0])}" cy="${r2(p[1])}" r="${r2(r)}" fill="${ink}"/>`; };
+  // crumbled lume: bites out of the edge of each dot, down to the dial, and a dark fleck or two
+  const wr = c.wear || {}, crnd = wr.crumble ? rng(wr.seed5 || 77) : null;
+  const crumble = (p, r) => { if (!crnd || !lc) return; const n = 1 + Math.round(crnd() * 2 * wr.crumble);
+    for (let i = 0; i < n; i++) { const th = crnd() * 6.283, q = r * (0.8 + crnd() * 0.35), br = r * (0.3 + crnd() * 0.3 * wr.crumble + 0.12); s += `<circle cx="${r2(p[0] + Math.cos(th) * q)}" cy="${r2(p[1] + Math.sin(th) * q)}" r="${r2(br)}" fill="${d.color}"/>`; }
+    const th = crnd() * 6.283; s += `<circle cx="${r2(p[0] + Math.cos(th) * r * 0.3)}" cy="${r2(p[1] + Math.sin(th) * r * 0.3)}" r="${r2(r * 0.2)}" fill="#2a1c0c" opacity="${r2(0.5 * wr.crumble)}"/>`; };
+  const dotIdx = (a, t, r) => { const p = E(a, t); if (AM) s += `<circle cx="${r2(p[0])}" cy="${r2(p[1])}" r="${r2(r + 1.2)}" fill="${AM[1]}" stroke="${AM[4]}" stroke-width="0.4"/>`; if (lc) { lumeEl(`<circle class="" cx="${r2(p[0])}" cy="${r2(p[1])}" r="${r2(r)}" fill="#L#"/>`); crumble(p, r); } else s += `<circle cx="${r2(p[0])}" cy="${r2(p[1])}" r="${r2(r)}" fill="${ink}"/>`; };
   const triIdx = (a, t1, t2, w, inward) => { const b = E(a, inward ? t2 : t1), tip = E(a, inward ? t1 : t2); const nx = Math.cos(rad(a)) * w / 2, ny = Math.sin(rad(a)) * w / 2; const dd = `M${r2(b[0] - nx)},${r2(b[1] - ny)}L${r2(b[0] + nx)},${r2(b[1] + ny)}L${r2(tip[0])},${r2(tip[1])}Z`; if (AM) { s += `<path d="${dd}" fill="${AM[1]}" stroke="${AM[4]}" stroke-width="0.5" stroke-linejoin="round"/>`; if (lc) lumeEl(`<path class="" d="${dd}" fill="#L#" transform="translate(${r2((b[0] + tip[0]) / 2 * 0.0)},0) scale(1)" opacity="0.0"/>`); } else if (lc) lumeEl(`<path class="" d="${dd}" fill="#L#"/>`); else s += `<path d="${dd}" fill="${ink}"/>`; };
   const ROM = ['', 'I', 'II', 'III', d.iv ? 'IV' : 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
   const ns = Rd * (d.numSize || 0.2), nt = d.numAt || 0.72;
-  const pip = (a) => { if (d.pips) { const p = E(a, 0.9); if (lc) lumeEl(`<circle class="" cx="${r2(p[0])}" cy="${r2(p[1])}" r="${r2(Rd * 0.028)}" fill="#L#"/>`); } };
+  const pip = (a) => { if (d.pips) { const p = E(a, 0.9); if (lc) { lumeEl(`<circle class="" cx="${r2(p[0])}" cy="${r2(p[1])}" r="${r2(Rd * 0.028)}" fill="#L#"/>`); crumble(p, Rd * 0.028); } } };
   for (let i = 1; i <= 12; i++) {
     const a = i * 30; if (skip[i]) { continue; }
     switch (it) {
@@ -557,9 +630,13 @@ function dial(c, g, id, M, out) {
 
   /* patina & damage */
   const w = c.wear || {};
-  if (w.spots) { const rnd = rng(w.seed || 21); let q = ''; for (let i = 0; i < w.spots; i++) { const p = E(rnd() * 360, 0.15 + rnd() * 0.82); q += `<circle cx="${r2(p[0])}" cy="${r2(p[1])}" r="${r2(0.5 + rnd() * 1.6)}" fill="${w.spotColor || '#6b4a22'}" opacity="${r2(0.25 + rnd() * 0.4)}"/>`; } s += q; }
+  if (w.spots) { const rnd = rng(w.seed || 21), si = w.spotsIn != null ? w.spotsIn : 0.15; let q = ''; for (let i = 0; i < w.spots; i++) { const p = E(rnd() * 360, si + rnd() * (0.97 - si)); q += `<circle cx="${r2(p[0])}" cy="${r2(p[1])}" r="${r2(0.5 + rnd() * 1.6)}" fill="${w.spotColor || '#6b4a22'}" opacity="${r2(0.25 + rnd() * 0.4)}"/>`; } s += q; }
   if (w.cracks) { const rnd = rng(w.seed || 9); for (let i = 0; i < w.cracks; i++) { let a = rnd() * 360, t = 0.2 + rnd() * 0.3, p = E(a, t), q = `M${pt(p)}`; for (let k = 0; k < 5; k++) { a += rnd() * 16 - 8; t += 0.14; p = E(a, Math.min(t, 1)); q += `L${pt(p)}`; } s += `<path d="${q}" fill="none" stroke="#3a3328" stroke-width="0.45" opacity="0.7"/>`; } }
-  if (w.moist) s += `<circle r="${r2(Rd * 0.93)}" fill="none" stroke="#5a4020" stroke-width="${r2(Rd * 0.14)}" opacity="${w.moist}" filter="url(#${id}bz)"/>`;
+  if (w.moist && w.moistAt != null) { // water that got in once and pooled along one stretch of the edge
+    const sp = w.moistSpan || 110, a0 = w.moistAt - sp / 2, mr = w.moistR || 0.95, rnd = rng(w.seed6 || 29), f1 = rnd() * 6, f2 = rnd() * 6; let q = '', tl = '';
+    for (let i = 0; i <= 40; i++) { const u = i / 40, a = a0 + sp * u, k = Math.sin(Math.PI * u); q += (i ? 'L' : 'M') + pt(E(a, mr - 0.03 * k)); tl += (i ? 'L' : 'M') + pt(E(a, mr + 0.035 - (0.135 + 0.014 * Math.sin(u * 17 + f1) + 0.009 * Math.sin(u * 41 + f2)) * Math.pow(k, 0.6))); }
+    s += `<path d="${q}" fill="none" stroke="#5a4020" stroke-width="${r2(Rd * 0.16)}" stroke-linecap="round" opacity="${r2(Math.min(1, w.moist * 1.5))}" filter="url(#${id}bz)"/><path d="${tl}" fill="none" stroke="#7a5a30" stroke-width="0.6" stroke-linejoin="round" stroke-linecap="round" opacity="${r2(Math.min(1, w.moist * 1.1))}"/>`;
+  } else if (w.moist) s += `<circle r="${r2(Rd * 0.93)}" fill="none" stroke="#5a4020" stroke-width="${r2(Rd * 0.14)}" opacity="${w.moist}" filter="url(#${id}bz)"/>`;
   if (w.burn) s += `<circle r="${r2(Rd * 0.5)}" fill="none" stroke="#5a3a14" stroke-width="${r2(Rd * 0.2)}" opacity="${w.burn}" filter="url(#${id}bz)"/>`;
 
   s += '</g>';
@@ -679,7 +756,15 @@ function crystal(c, g, id) {
     s += `<path d="M${r2(-g.hw)},${r2(-g.hh)}L${r2(g.hw * 0.2)},${r2(-g.hh)}L${r2(-g.hw)},${r2(g.hh * 0.3)}Z" fill="#fff" opacity="0.08"/>`;
   }
   const w = c.wear || {};
-  if (w.scratches) { const rnd = rng(w.seed2 || 5); for (let i = 0; i < w.scratches; i++) { const a = rnd() * 360, p = g.E(a, rnd() * 0.8), l = 6 + rnd() * 22, d = rnd() * 180; s += `<line x1="${r2(p[0])}" y1="${r2(p[1])}" x2="${r2(p[0] + Math.cos(rad(d)) * l)}" y2="${r2(p[1] + Math.sin(rad(d)) * l)}" stroke="#fff" stroke-width="0.5" opacity="${r2(0.14 + rnd() * 0.2)}" clip-path="url(#${id}dc)"/>`; } }
+  if (w.haze) { // scuffed all over, fine as cobweb: a veil, and hundreds of hairlines that mostly run two ways
+    const rnd = rng(w.seed7 || 61), n = Math.round(760 * w.haze), q = ['', '', '', ''], d0 = rnd() * 180;
+    for (let i = 0; i < n; i++) { const p = g.E(rnd() * 360, Math.sqrt(rnd()) * 0.97), l = 1.5 + rnd() * rnd() * 13, d = (rnd() < 0.6 ? d0 + (rnd() < 0.5 ? 0 : 70) : rnd() * 180) + rnd() * 24 - 12;
+      q[i % 4] += `M${pt(p)}l${r2(Math.cos(rad(d)) * l)},${r2(Math.sin(rad(d)) * l)}`; }
+    s += `<g clip-path="url(#${id}dc)" fill="none" stroke-linecap="round"><circle r="${r2(Rd + 1)}" fill="#cfd2d0" opacity="${r2(0.13 * w.haze)}"/><path d="${q[0]}" stroke="#fff" stroke-width="0.18" opacity="${r2(0.16 + 0.1 * w.haze)}"/><path d="${q[1]}" stroke="#fff" stroke-width="0.26" opacity="${r2(0.2 + 0.12 * w.haze)}"/><path d="${q[2]}" stroke="#20201c" stroke-width="0.18" opacity="${r2(0.12 + 0.06 * w.haze)}"/><path d="${q[3]}" stroke="#20201c" stroke-width="0.26" opacity="${r2(0.14 + 0.08 * w.haze)}"/></g>`;
+  }
+  if (w.scratches) { const rnd = rng(w.seed2 || 5); for (let i = 0; i < w.scratches; i++) { const a = rnd() * 360, p = g.E(a, rnd() * 0.8), l = 6 + rnd() * 22, d = rnd() * 180, x2 = p[0] + Math.cos(rad(d)) * l, y2 = p[1] + Math.sin(rad(d)) * l, o = 0.14 + rnd() * 0.2;
+    // each scratch has a lit edge and a shadowed one, so it reads on a pale dial as well as a dark one
+    s += `<line x1="${r2(p[0] + 0.35)}" y1="${r2(p[1] + 0.35)}" x2="${r2(x2 + 0.35)}" y2="${r2(y2 + 0.35)}" stroke="#20201c" stroke-width="0.5" opacity="${r2(o * 0.55)}" clip-path="url(#${id}dc)"/><line x1="${r2(p[0])}" y1="${r2(p[1])}" x2="${r2(x2)}" y2="${r2(y2)}" stroke="#fff" stroke-width="0.5" opacity="${r2(o)}" clip-path="url(#${id}dc)"/>`; } }
   return s + '</g>';
 }
 
@@ -696,7 +781,7 @@ function backPlate(c, g, id, M) {
   (b.lines || []).forEach(t => { s += `<text x="${r2((t.x || 0) * rb)}" y="${r2(t.y * rb)}" font-family="${FONT[t.f || 'sans']}" font-size="${t.s || 9}" font-weight="${t.w || 500}" letter-spacing="${t.ls != null ? t.ls : 1.2}" fill="${t.c || M[4]}" text-anchor="middle" dominant-baseline="central" opacity="${t.o || 0.85}" ${t.rot ? `transform="rotate(${t.rot} ${r2((t.x || 0) * rb)} ${r2(t.y * rb)})"` : ''}>${esc(t.t)}</text>`; });
   if (b.logo) s += logo(b.logo, rb, M[4], b.logoY != null ? b.logoY : -0.3);
   const w = c.wear || {};
-  if (w.backScratches) { const rnd = rng(31); for (let i = 0; i < w.backScratches; i++) { const p = P(rnd() * rb * 0.85, rnd() * 360), l = 8 + rnd() * 30, d = rnd() * 180; s += `<line x1="${r2(p[0])}" y1="${r2(p[1])}" x2="${r2(p[0] + Math.cos(rad(d)) * l)}" y2="${r2(p[1] + Math.sin(rad(d)) * l)}" stroke="${rnd() > 0.5 ? M[0] : M[4]}" stroke-width="0.5" opacity="0.35"/>`; } }
+  if (w.backScratches) { const rnd = rng(w.seed3 || 31); for (let i = 0; i < w.backScratches; i++) { const p = P(rnd() * rb * 0.85, rnd() * 360), l = 8 + rnd() * 30, d = rnd() * 180; s += `<line x1="${r2(p[0])}" y1="${r2(p[1])}" x2="${r2(p[0] + Math.cos(rad(d)) * l)}" y2="${r2(p[1] + Math.sin(rad(d)) * l)}" stroke="${rnd() > 0.5 ? M[0] : M[4]}" stroke-width="0.5" opacity="0.35"/>`; } }
   return s + '</g>';
 }
 
@@ -826,6 +911,7 @@ function movement(c, g, id, M) {
 W.svg = function (cfg, o) {
   o = o || {};
   const c = merge(DEF, cfg || {}); if (cfg && cfg.strap === null) c.strap = null;
+  c.wear = wearOf(c); if (c.wear.replaced != null) c.crown = Object.assign({}, c.crown, { replaced: c.wear.replaced });
   const id = 'w' + (++UID), g = geom(c), R = g.R, M = METAL[c.metal] || METAL.steel, view = o.view || 'dial';
   let body = '', out = {};
   const mirror = view !== 'dial';

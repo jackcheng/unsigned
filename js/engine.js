@@ -165,6 +165,7 @@ let bgFlip = false;
 G.setBg = function (name, o, instant) {
   if (!G.s) return;
   G.s.bg = name; G.s.bgo = o || null;
+  if (G.stopAt) return;   // a silent run only needs to remember the backdrop, not to draw it
   const a = $('#bg'), b = $('#bg2'), front = bgFlip ? a : b, back = bgFlip ? b : a;
   bgFlip = !bgFlip;
   let html = '';
@@ -198,6 +199,7 @@ G.watchSvg = function (id, o) {
   return Watch.svg(cfg, Object.assign({ live: !!w.live }, o || {}));
 };
 G.setProp = function (items, o) {
+  if (G.stopAt) return;
   o = o || {}; const p = $('#prop');
   if (!items) { p.classList.remove('on'); setTimeout(() => { if (!p.classList.contains('on')) p.innerHTML = ''; }, 500); return; }
   if (!Array.isArray(items)) items = [items];
@@ -226,7 +228,7 @@ G.toast = function (kind, text) {
   setTimeout(() => { t.classList.remove('on'); setTimeout(() => t.remove(), 600); }, 4200);
 };
 const TOOLHINT = { carnet: 'Her notebook is in the top bar now. Press C.', roll: 'The watch roll is in the top bar now. Press R.', lineage: 'The lineage board is open. Press L.' };
-G.unlockTool = function (name) { if (G.s.tools[name]) return; G.s.tools[name] = 1; G.setHud(); if (TOOLHINT[name]) setTimeout(() => G.toast('New', TOOLHINT[name]), 900); };
+G.unlockTool = function (name) { if (G.s.tools[name]) return; G.s.tools[name] = 1; G.setHud(); if (TOOLHINT[name] && !G.auto) setTimeout(() => G.toast('New', TOOLHINT[name]), 900); };
 G.learn = function (ids) {
   const names = [];
   ids.forEach(id => { if (!G.s.nodes[id]) { G.s.nodes[id] = 1; G.s.news.nodes[id] = 1; const n = (window.Lineage ? Lineage.nodes : []).find(x => x.id === id); names.push(n ? n.name : id); } });
@@ -462,7 +464,9 @@ G.run = async function (sceneId) {
     const steps = G.scenes[sceneId];
     if (!steps) { console.error('Missing scene: ' + sceneId); break; }
     G.s.scene = sceneId; G.metScene = {};
-    G.snap = clone(G.s); G.save();
+    G.snap = clone(G.s);
+    if (G.stopAt) { if (G.stopAt === sceneId) break; }   // a silent run for the chapter list: nothing is saved, and it ends as this scene opens
+    else G.save();
     sceneId = await runScene(steps);
   }
   G.running = false;
